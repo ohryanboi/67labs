@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>67 Labs - Practice Circuit</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- News Ticker -->
+        <div id="newsTicker" class="news-ticker"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">67 Labs</div>
+            <div class="tier-badge" id="currentTier">🥉 Bronze Strategist</div>
+            <div class="speed-control">
+                <span class="speed-label">Speed:</span>
+                <button class="speed-btn" onclick="setSpeed(4000)">Slow</button>
+                <button class="speed-btn active" onclick="setSpeed(2000)">Normal</button>
+                <button class="speed-btn" onclick="setSpeed(1000)">Fast</button>
+                <button class="speed-btn" onclick="setSpeed(500)">Ultra</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Digital Reserve</div>
+                <div class="stat-value" id="digitalReserve">$100,000.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Wealth Zone Score</div>
+                <div class="stat-value" id="wealthZoneScore">$100,000.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Performance Metric</div>
+                <div class="stat-value" id="performanceMetric">$0.00 (0%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Trades</div>
+                <div class="stat-value" id="totalTrades">0</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('trading')">📈 Trading</div>
+            <div class="tab" onclick="switchTab('portfolio')">💼 Portfolio</div>
+            <div class="tab" onclick="switchTab('analytics')">📊 Analytics</div>
+            <div class="tab" onclick="switchTab('progression')">🏅 Progression</div>
+            <div class="tab" onclick="switchTab('achievements')">🏆 Achievements</div>
+            <div class="tab" onclick="switchTab('shop')">🛒 Shop & Codes</div>
+            <div class="tab" onclick="switchTab('prestige')">🌟 Prestige</div>
+            <div class="tab" onclick="switchTab('settings')">⚙️ Settings</div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="trading" class="tab-content active">
+            <div class="nodes-grid" id="tradingGrid"></div>
+        </div>
+
+        <div id="portfolio" class="tab-content">
+            <!-- Daily Challenge -->
+            <div id="dailyChallengeContainer" style="margin-bottom: 30px;"></div>
+
+            <!-- Market Event -->
+            <div id="marketEventContainer" style="margin-bottom: 30px;"></div>
+
+            <div class="portfolio-section">
+                <div class="section-title">Active Strategies</div>
+                <div id="activeStrategies"></div>
+            </div>
+
+            <div class="portfolio-section">
+                <div class="section-title">Active Orders</div>
+                <div id="activeOrders"></div>
+            </div>
+
+            <div class="portfolio-section">
+                <div class="section-title">Completed Cycles</div>
+                <div id="completedCycles"></div>
+            </div>
+        </div>
+
+        <div id="analytics" class="tab-content">
+            <h2 style="color: #00f0ff; margin-bottom: 20px;">📊 Analytics & Statistics</h2>
+
+            <!-- Statistics Section -->
+            <div id="statisticsContainer" style="margin-bottom: 40px;"></div>
+
+            <!-- Charts Section -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #00f0ff; margin-bottom: 15px;">📈 Portfolio Performance</h3>
+                <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 20px; height: 300px;">
+                    <canvas id="portfolioPerformanceChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="color: #00f0ff; margin-bottom: 15px;">📊 Sector Performance</h3>
+                <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 20px; height: 400px;">
+                    <canvas id="sectorPerformanceChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="achievements" class="tab-content">
+            <h2 style="color: #00f0ff; margin-bottom: 20px;">🏆 Achievements</h2>
+            <div id="achievementsContainer"></div>
+        </div>
+
+        <div id="progression" class="tab-content">
+            <h2 style="color: #00f0ff; margin-bottom: 20px; text-align: center;">🏅 Progression & Ranks</h2>
+
+            <!-- Current Rank Display -->
+            <div class="tier-display" style="margin-bottom: 30px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(176, 0, 255, 0.1));">
+                <div style="text-align: center; color: #00f0ff; font-size: 14px; margin-bottom: 10px; font-weight: bold;">YOUR CURRENT RANK</div>
+                <div class="tier-icon" id="rankIconLarge" style="font-size: 64px;">🔰</div>
+                <div class="tier-name" id="rankNameLarge" style="font-size: 28px; margin-bottom: 10px;">Novice III</div>
+                <div style="color: #888; margin-bottom: 15px; font-size: 16px;">
+                    <span id="rankPointsDisplay">0 RP</span>
+                </div>
+                <div style="color: #888; margin-bottom: 15px;">
+                    <span id="rankProgressLarge">0 / 100 RP to next rank</span>
+                </div>
+                <div class="progress-bar" style="height: 12px;">
+                    <div class="progress-fill" id="rankProgressBarLarge" style="width: 0%; background: linear-gradient(90deg, #00f0ff, #b000ff);"></div>
+                </div>
+            </div>
+
+            <!-- Wealth Tier Display -->
+            <div class="tier-display" style="margin-bottom: 30px;">
+                <div style="text-align: center; color: #b000ff; font-size: 12px; margin-bottom: 5px;">WEALTH TIER</div>
+                <div class="tier-icon" id="tierIcon">🥉</div>
+                <div class="tier-name" id="tierName">Bronze Strategist</div>
+                <div style="color: #888; margin-bottom: 15px;">
+                    <span id="tierProgress">$100,000.00 / $125,000.00</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="tierProgressBar" style="width: 80%"></div>
+                </div>
+            </div>
+
+            <!-- How to Earn RP -->
+            <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                <h3 style="color: #00f0ff; margin-bottom: 15px;">💎 How to Earn Rank Points</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 5px;">Trading</div>
+                        <div style="color: #888; font-size: 13px; line-height: 1.6;">
+                            • Complete any trade: <span style="color: #00f0ff;">+5 RP</span><br>
+                            • Profitable trade: <span style="color: #00f0ff;">+10 RP</span><br>
+                            • 5%+ profit: <span style="color: #00f0ff;">+5 RP</span><br>
+                            • 10%+ profit: <span style="color: #00f0ff;">+10 RP</span><br>
+                            • 25%+ profit: <span style="color: #00f0ff;">+20 RP</span><br>
+                            • 50%+ profit: <span style="color: #00f0ff;">+30 RP</span><br>
+                            • Losing trade: <span style="color: #ff4444;">-2 RP</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 5px;">Achievements</div>
+                        <div style="color: #888; font-size: 13px; line-height: 1.6;">
+                            • Unlock milestone: <span style="color: #00f0ff;">+20 RP</span><br>
+                            • Trade in new sector: <span style="color: #00f0ff;">+15 RP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Milestone Unlocks -->
+            <div class="section-title">Milestone Unlocks</div>
+            <div class="milestones-grid" id="milestonesGrid"></div>
+
+            <!-- All Ranks Display -->
+            <div style="margin-top: 30px;">
+                <h3 style="color: #00f0ff; margin-bottom: 15px;">🏆 All Ranks</h3>
+                <div id="allRanksDisplay"></div>
+            </div>
+        </div>
+
+        <div id="shop" class="tab-content">
+            <h2 style="color: #00f0ff; margin-bottom: 20px;">🛒 Potion Shop</h2>
+            <div id="shopContainer"></div>
+
+            <h2 style="color: #00f0ff; margin: 40px 0 20px 0;">🎁 Redeem Codes</h2>
+            <div id="codesContainer"></div>
+        </div>
+
+        <div id="prestige" class="tab-content">
+            <h2 style="color: #00f0ff; margin-bottom: 20px;">🌟 Prestige System</h2>
+            <div id="prestigeContainer"></div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <h2 style="color: #00f0ff; margin-bottom: 20px;">⚙️ Settings & Customization</h2>
+            <div id="settingsContainer"></div>
+        </div>
+    </div>
+
+    <!-- Acquire Modal -->
+    <div id="acquireModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Acquire Node</div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #00f0ff;" id="modalSymbol">TECH-A</div>
+                    <div style="color: #888; margin-top: 5px;" id="modalName">TechCorp Alpha</div>
+                    <div style="font-size: 20px; margin-top: 10px;">Price: <span id="modalPrice">$150.00</span></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" id="quantityInput" class="form-input" value="1" min="1" oninput="updateTotalCost()">
+                    <div class="quick-select">
+                        <button class="quick-btn" onclick="setQuickQuantity(25)">25%</button>
+                        <button class="quick-btn" onclick="setQuickQuantity(50)">50%</button>
+                        <button class="quick-btn" onclick="setQuickQuantity(75)">75%</button>
+                        <button class="quick-btn" onclick="setQuickQuantity(100)">100%</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="color: #888; margin-bottom: 5px;">Total Cost</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #00f0ff;" id="totalCost">$150.00</div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="acquireNode(document.getElementById('modalSymbol').textContent)">
+                    Acquire Node
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expanded Chart Modal -->
+    <div id="expandedChartModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px; width: 90%;">
+            <div class="modal-header">
+                <div class="modal-title" id="expandedChartTitle">Chart View</div>
+                <button class="close-btn" onclick="closeExpandedChart()">&times;</button>
+            </div>
+            <div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #00f0ff;" id="expandedChartSymbol">TECH-A</div>
+                    <div style="color: #888; margin-top: 5px;" id="expandedChartName">TechCorp Alpha</div>
+                    <div style="font-size: 20px; margin-top: 10px;">Price: <span id="expandedChartPrice">$150.00</span></div>
+                </div>
+
+                <!-- Expanded Chart Canvas -->
+                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px; position: relative;">
+                    <canvas id="expandedChartCanvas" style="width: 100%; height: 400px;"></canvas>
+                    <div id="expandedChartTooltip" style="position: absolute; background: rgba(0,0,0,0.9); border: 1px solid #00f0ff; border-radius: 6px; padding: 8px 12px; color: #00f0ff; font-size: 12px; pointer-events: none; display: none; z-index: 1000;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="orderModalTitle">Set Order</div>
+                <button class="close-btn" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #00f0ff;" id="orderModalSymbol">TECH-A</div>
+                    <div style="color: #888; margin-top: 5px;">Current Price: <span id="orderModalCurrentPrice">$150.00</span></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" id="orderModalLabel">Target Price</label>
+                    <input type="number" id="orderPriceInput" class="form-input" step="0.01" min="0.01">
+                    <div id="orderQuantityGroup" class="form-group" style="display: none; margin-top: 15px;">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" id="orderQuantityInput" class="form-input" value="1" min="1">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="submitOrder()">
+                    Set Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheat Menu Modal -->
+    <div id="cheatMenuModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #00f0ff; margin: 0;">🎮 Cheat Menu</h2>
+                <button class="close-btn" onclick="closeCheatMenu()">✕</button>
+            </div>
+
+            <div style="display: grid; gap: 20px;">
+                <!-- Money Cheat -->
+                <div style="background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #00f0ff; margin-bottom: 10px;">💰 Add Money</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="cheatMoneyAmount" class="form-input" placeholder="Amount" value="100000" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="cheatAddMoney()">Add</button>
+                    </div>
+                </div>
+
+                <!-- RP Cheat -->
+                <div style="background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #00f0ff; margin-bottom: 10px;">⭐ Add Rank Points</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="cheatRPAmount" class="form-input" placeholder="Amount" value="1000" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="cheatAddRP()">Add</button>
+                    </div>
+                </div>
+
+                <!-- Quick Cheats -->
+                <div style="background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #00f0ff; margin-bottom: 10px;">⚡ Quick Cheats</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatMaxRank()">👑 Max Rank</button>
+                        <button class="btn btn-secondary" onclick="cheatUnlockAllThemes()">🎨 All Themes</button>
+                        <button class="btn btn-secondary" onclick="cheatAddPotions()">🧪 +10 Potions</button>
+                        <button class="btn btn-secondary" onclick="cheatUnlockAllAchievements()">🏆 All Achievements</button>
+                        <button class="btn btn-secondary" onclick="cheatCompleteChallenge()">🎯 Complete Challenge</button>
+                        <button class="btn btn-secondary" id="freezePriceBtn" onclick="cheatFreezePrice()">❄️ Freeze Prices</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; color: #888; font-size: 12px;">
+                    ⚠️ Using cheats may affect game balance
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Log Modal -->
+    <div id="updateLogModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h2 style="color: #00f0ff; margin: 0;" id="updateLogTitle">Update Log</h2>
+                    <div style="color: #888; font-size: 14px; margin-top: 5px;">
+                        <span id="updateLogVersion">v1.0.0</span> • <span id="updateLogDate">2025-10-31</span>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeUpdateLog()">✕</button>
+            </div>
+
+            <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 12px; padding: 20px;">
+                <h3 style="color: #00f0ff; margin-bottom: 15px; font-size: 16px;">📝 What's New</h3>
+                <ul id="updateLogList" style="list-style: none; padding: 0; margin: 0;">
+                    <!-- Updates will be populated here -->
+                </ul>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-primary" onclick="closeUpdateLog()" style="padding: 12px 30px;">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript files in correct order -->
+    <script src="js/config.js"></script>
+    <script src="js/game-state.js"></script>
+    <script src="js/price-updates.js"></script>
+    <script src="js/trading.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/progression.js"></script>
+    <script src="js/themes.js"></script>
+    <script src="js/ui-helpers.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/ui-render.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+
