@@ -20,23 +20,20 @@ function updateTier() {
 // Calculate rank points
 function calculateRankPoints() {
     let points = 0;
-    
+
     // Points from completed trades
     points += gameState.completedCycles.length * 10;
-    
+
     // Points from wealth
     const wealth = calculateWealthZoneScore();
     points += Math.floor(wealth / 10000);
-    
+
     // Points from milestones
     points += gameState.milestones.length * 100;
-    
+
     // Points from achievements
     points += (gameState.secretAchievements || []).length * 150;
-    
-    // Apply prestige multiplier
-    points *= gameState.prestigeBonuses.rpMultiplier;
-    
+
     return Math.floor(points);
 }
 
@@ -286,17 +283,17 @@ function checkSecretAchievements() {
                 unlocked = gameState.activeStrategies.length >= 20;
                 break;
             case 'market_master':
-                unlocked = gameState.completedCycles.length >= 500 && 
+                unlocked = gameState.completedCycles.length >= 500 &&
                           (gameState.totalWins / (gameState.totalWins + gameState.totalLosses)) >= 0.7;
-                break;
-            case 'prestige_hunter':
-                unlocked = gameState.prestigeLevel >= 1;
                 break;
             case 'achievement_hunter':
                 unlocked = gameState.secretAchievements.length >= 10;
                 break;
             case 'legendary_trader':
-                unlocked = gameState.currentRank >= 19 && calculateWealthZoneScore() >= 10000000;
+                unlocked = gameState.currentRank >= 29 && calculateWealthZoneScore() >= 10000000;
+                break;
+            case 'infinite_trader':
+                unlocked = gameState.currentRank >= 59; // Infinite I rank
                 break;
         }
 
@@ -376,49 +373,5 @@ function getProfitBySectorSorted() {
         .sort((a, b) => b.profit - a.profit);
 }
 
-// Prestige Helper Functions
-function canPrestige() {
-    return gameState.currentRank >= 10 && calculateWealthZoneScore() >= 1000000;
-}
-
-function getPrestigeBonuses(level) {
-    return {
-        startingCapitalBonus: level * 10,
-        rpMultiplier: 1 + (level * 0.1),
-        tradingFeeReduction: level * 5
-    };
-}
-
-// Prestige System
-function prestige() {
-    if (!canPrestige()) {
-        showNotification('❌ Prestige requires Rank 10+ and $1M wealth');
-        return;
-    }
-
-    if (!confirm('Are you sure you want to prestige?\n\nYou will lose all progress but gain permanent bonuses:\n+10% starting capital\n+10% RP multiplier\n+5% trading fee reduction')) {
-        return;
-    }
-
-    gameState.prestigeLevel++;
-    gameState.prestigeBonuses.startingCapitalBonus += 10;
-    gameState.prestigeBonuses.rpMultiplier += 0.1;
-    gameState.prestigeBonuses.tradingFeeReduction += 5;
-
-    // Reset progress
-    const newStartingCapital = STARTER_CAPITAL * (1 + gameState.prestigeBonuses.startingCapitalBonus / 100);
-    gameState.digitalReserve = newStartingCapital;
-    gameState.activeStrategies = [];
-    gameState.completedCycles = [];
-    gameState.currentTier = 0;
-    gameState.currentRank = 0;
-    gameState.rankPoints = 0;
-
-    showNotification(`🌟 Prestige ${gameState.prestigeLevel}! You now start with ${formatCurrency(newStartingCapital)}`);
-    playSound('achievement');
-    createConfetti();
-
-    saveState();
-    renderAll();
-}
+// Prestige system removed - now using extended rank system instead
 

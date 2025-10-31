@@ -39,14 +39,6 @@ let gameState = {
     lastLoginDate: null,
     loginStreak: 0,
 
-    // Prestige System
-    prestigeLevel: 0,
-    prestigeBonuses: {
-        startingCapitalBonus: 0, // % bonus
-        rpMultiplier: 1.0,
-        tradingFeeReduction: 0 // % reduction
-    },
-
     // Customization & Settings
     currentTheme: 'default', // default, matrix, cyberpunk, neon
     unlockedThemes: ['default'],
@@ -84,23 +76,38 @@ let gameState = {
 
 // Load saved state
 function loadState() {
+    // Check if we're in the middle of a reset
+    const isResetting = localStorage.getItem('67labs-resetting');
+    if (isResetting === 'true') {
+        // Clear the reset flag
+        localStorage.removeItem('67labs-resetting');
+        // Don't load any saved state - start fresh
+        console.log('Game reset detected - starting fresh with $' + STARTER_CAPITAL);
+        return;
+    }
+
     const saved = localStorage.getItem('67labs-state');
     if (saved) {
-        const parsed = JSON.parse(saved);
-        gameState = { ...gameState, ...parsed };
+        try {
+            const parsed = JSON.parse(saved);
+            gameState = { ...gameState, ...parsed };
 
-        // Convert tradedSectors array back to Set
-        if (parsed.tradedSectorsArray) {
-            gameState.tradedSectors = new Set(parsed.tradedSectorsArray);
-        }
-
-        MILESTONES.forEach((m, i) => {
-            if (gameState.milestones.includes(m.id)) {
-                m.unlocked = true;
+            // Convert tradedSectors array back to Set
+            if (parsed.tradedSectorsArray) {
+                gameState.tradedSectors = new Set(parsed.tradedSectorsArray);
             }
-        });
 
-        console.log('Loaded state - Digital Reserve:', gameState.digitalReserve);
+            MILESTONES.forEach((m, i) => {
+                if (gameState.milestones.includes(m.id)) {
+                    m.unlocked = true;
+                }
+            });
+
+            console.log('Loaded state - Digital Reserve:', gameState.digitalReserve);
+        } catch (error) {
+            console.error('Error loading saved state:', error);
+            console.log('Starting fresh due to error');
+        }
     } else {
         console.log('No saved state - Starting with:', gameState.digitalReserve);
     }
@@ -121,26 +128,69 @@ function saveState() {
 
 // Reset game (clear all progress)
 function resetGame() {
-    if (confirm('Are you sure you want to reset all progress? This cannot be undone!')) {
-        // Clear localStorage completely
-        localStorage.clear();
+    const confirmMessage = '⚠️ WARNING ⚠️\n\nThis will permanently delete ALL your progress:\n\n' +
+                          '• All money and investments\n' +
+                          '• All ranks and achievements\n' +
+                          '• All unlocked themes and badges\n' +
+                          '• All potions and codes\n' +
+                          '• Everything will be reset to zero\n\n' +
+                          'This action CANNOT be undone!\n\n' +
+                          'Are you absolutely sure you want to continue?';
 
-        // Reset all EQUITY_NODES to base prices
-        EQUITY_NODES.forEach(node => {
-            node.currentPrice = node.basePrice;
-            node.previousPrice = node.basePrice;
-            node.priceHistory = [node.basePrice];
-            node.volumeHistory = [];
-            node.volume = 0;
-        });
+    if (confirm(confirmMessage)) {
+        try {
+            // Set a flag in localStorage to indicate we're resetting
+            localStorage.setItem('67labs-resetting', 'true');
 
-        // Reset all MILESTONES
-        MILESTONES.forEach(m => {
-            m.unlocked = false;
-        });
+            // Clear all game data
+            localStorage.removeItem('67labs-state');
+            sessionStorage.clear();
 
-        // Force reload to completely reset the page
-        location.reload(true);
+            // Reset all EQUITY_NODES to base prices
+            if (typeof EQUITY_NODES !== 'undefined') {
+                EQUITY_NODES.forEach(node => {
+                    node.currentPrice = node.basePrice;
+                    node.previousPrice = node.basePrice;
+                    node.priceHistory = [node.basePrice];
+                    node.volumeHistory = [0];
+                    node.volume = 0;
+                    node.open = node.basePrice;
+                    node.high = node.basePrice;
+                    node.low = node.basePrice;
+                    node.close = node.basePrice;
+                });
+            }
+
+            // Reset all MILESTONES
+            if (typeof MILESTONES !== 'undefined') {
+                MILESTONES.forEach(m => {
+                    m.unlocked = false;
+                });
+            }
+
+            // Reset all SECRET_ACHIEVEMENTS
+            if (typeof SECRET_ACHIEVEMENTS !== 'undefined') {
+                SECRET_ACHIEVEMENTS.forEach(a => {
+                    a.unlocked = false;
+                });
+            }
+
+            // Reset global flags
+            pricesFrozen = false;
+
+            // Show notification before reload
+            if (typeof showNotification === 'function') {
+                showNotification('🔄 Resetting game... Page will reload.');
+            }
+
+            // Force hard reload to completely reset the page
+            setTimeout(() => {
+                window.location.href = window.location.href.split('?')[0] + '?reset=' + Date.now();
+            }, 500);
+        } catch (error) {
+            console.error('Error during reset:', error);
+            alert('Error resetting game. Please refresh the page manually.');
+        }
     }
 }
 

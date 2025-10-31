@@ -149,21 +149,23 @@ function checkBadgeUnlocks() {
         showNotification('🏅 Unlocked "Achievement Hunter" badge!');
     }
 
-    // Prestige badges
-    if (gameState.prestigeLevel >= 1 && !gameState.unlockedBadges.includes('prestige_i')) {
-        gameState.unlockedBadges.push('prestige_i');
-        showNotification('🏅 Unlocked "Prestige I" badge!');
+    // Unlock badges for higher ranks
+    if (gameState.currentRank >= 32 && !gameState.unlockedBadges.includes('divine_trader')) {
+        gameState.unlockedBadges.push('divine_trader');
+        gameState.unlockedBadges.push('divine'); // Title
+        showNotification('🏅 Unlocked "Divine Trader" badge!');
     }
 
-    if (gameState.prestigeLevel >= 5 && !gameState.unlockedBadges.includes('prestige_v')) {
-        gameState.unlockedBadges.push('prestige_v');
-        gameState.unlockedBadges.push('prestige_master'); // Title
-        showNotification('🏅 Unlocked "Prestige V" badge!');
+    if (gameState.currentRank >= 41 && !gameState.unlockedBadges.includes('cosmic_lord')) {
+        gameState.unlockedBadges.push('cosmic_lord');
+        gameState.unlockedBadges.push('cosmic'); // Title
+        showNotification('🏅 Unlocked "Cosmic Lord" badge!');
     }
 
-    if (gameState.prestigeLevel >= 10 && !gameState.unlockedBadges.includes('prestige_x')) {
-        gameState.unlockedBadges.push('prestige_x');
-        showNotification('🏅 Unlocked "Prestige X" badge!');
+    if (gameState.currentRank >= 59 && !gameState.unlockedBadges.includes('infinite_master')) {
+        gameState.unlockedBadges.push('infinite_master');
+        gameState.unlockedBadges.push('infinite'); // Title
+        showNotification('🏅 Unlocked "Infinite Master" badge!');
     }
 
     // Unlock titles based on ranks

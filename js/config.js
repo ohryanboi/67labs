@@ -7,15 +7,15 @@ const STARTER_CAPITAL = 100000;
 // Change the version number and update notes below
 // The update log will show every time the game loads
 const UPDATE_LOG = {
-    version: "1.0.1",
+    version: "1.0.2",
     date: "2025-10-31",
-    title: "67 Labs Update 1.0.1 MANGO MANGO",
+    title: "67 Labs Update 1.0.2 THE RANKS UPDATE",
     updates: [
-        "Added codes to redemeem. Use code 67Labs to get $10,000",
-        "Added a shop with potions and boosts.",
-        "Autosell and Autobuy",
-        "SECRET ACHIEVEMENTS",
-        "secret codes!!!"
+        "ADDED 10 NEW RANKS",
+        "removed prestige ;(((( LLLL",
+        "thats it lmao",
+        "bug fixes",
+        "use code 1.0.2"
     ],
     showOnLoad: true // Set to false to disable the update log popup
 };
@@ -82,7 +82,57 @@ const RANKS = [
     // Rank 10: Immortal (10000+ points)
     { name: 'Immortal III', icon: '🌟', color: '#FFD700', pointsRequired: 10000 },
     { name: 'Immortal II', icon: '🌟', color: '#FFEA00', pointsRequired: 15000 },
-    { name: 'Immortal I', icon: '🌟', color: '#FFFF00', pointsRequired: 25000 }
+    { name: 'Immortal I', icon: '🌟', color: '#FFFF00', pointsRequired: 25000 },
+
+    // Rank 11: Divine (35000+ points)
+    { name: 'Divine III', icon: '✨', color: '#FF00FF', pointsRequired: 35000 },
+    { name: 'Divine II', icon: '✨', color: '#FF1AFF', pointsRequired: 50000 },
+    { name: 'Divine I', icon: '✨', color: '#FF33FF', pointsRequired: 70000 },
+
+    // Rank 12: Celestial (95000+ points)
+    { name: 'Celestial III', icon: '🌠', color: '#00FFFF', pointsRequired: 95000 },
+    { name: 'Celestial II', icon: '🌠', color: '#00E5FF', pointsRequired: 125000 },
+    { name: 'Celestial I', icon: '🌠', color: '#00D4FF', pointsRequired: 160000 },
+
+    // Rank 13: Ethereal (200000+ points)
+    { name: 'Ethereal III', icon: '💫', color: '#B19CD9', pointsRequired: 200000 },
+    { name: 'Ethereal II', icon: '💫', color: '#C8B6E2', pointsRequired: 250000 },
+    { name: 'Ethereal I', icon: '💫', color: '#DFD0EB', pointsRequired: 310000 },
+
+    // Rank 14: Cosmic (380000+ points)
+    { name: 'Cosmic III', icon: '🌌', color: '#4B0082', pointsRequired: 380000 },
+    { name: 'Cosmic II', icon: '🌌', color: '#6A0DAD', pointsRequired: 470000 },
+    { name: 'Cosmic I', icon: '🌌', color: '#8B00FF', pointsRequired: 580000 },
+
+    // Rank 15: Transcendent (710000+ points)
+    { name: 'Transcendent III', icon: '🔮', color: '#FF6EC7', pointsRequired: 710000 },
+    { name: 'Transcendent II', icon: '🔮', color: '#FF85D1', pointsRequired: 870000 },
+    { name: 'Transcendent I', icon: '🔮', color: '#FF9CDB', pointsRequired: 1060000 },
+
+    // Rank 16: Omnipotent (1280000+ points)
+    { name: 'Omnipotent III', icon: '⚡', color: '#FFD700', pointsRequired: 1280000 },
+    { name: 'Omnipotent II', icon: '⚡', color: '#FFDF00', pointsRequired: 1550000 },
+    { name: 'Omnipotent I', icon: '⚡', color: '#FFE700', pointsRequired: 1880000 },
+
+    // Rank 17: Apex (2260000+ points)
+    { name: 'Apex III', icon: '🔱', color: '#00CED1', pointsRequired: 2260000 },
+    { name: 'Apex II', icon: '🔱', color: '#00E5E5', pointsRequired: 2720000 },
+    { name: 'Apex I', icon: '🔱', color: '#00FFFF', pointsRequired: 3280000 },
+
+    // Rank 18: Sovereign (3940000+ points)
+    { name: 'Sovereign III', icon: '👑', color: '#DC143C', pointsRequired: 3940000 },
+    { name: 'Sovereign II', icon: '👑', color: '#FF1744', pointsRequired: 4740000 },
+    { name: 'Sovereign I', icon: '👑', color: '#FF4569', pointsRequired: 5700000 },
+
+    // Rank 19: Absolute (6840000+ points)
+    { name: 'Absolute III', icon: '💠', color: '#00FF00', pointsRequired: 6840000 },
+    { name: 'Absolute II', icon: '💠', color: '#00FF33', pointsRequired: 8220000 },
+    { name: 'Absolute I', icon: '💠', color: '#33FF66', pointsRequired: 9870000 },
+
+    // Rank 20: Infinite (11850000+ points) - THE ULTIMATE RANK
+    { name: 'Infinite III', icon: '♾️', color: '#FFFFFF', pointsRequired: 11850000 },
+    { name: 'Infinite II', icon: '♾️', color: '#F0F0F0', pointsRequired: 14220000 },
+    { name: 'Infinite I', icon: '♾️', color: '#E0E0E0', pointsRequired: 17070000 }
 ];
 
 // Milestones
@@ -149,9 +199,9 @@ const SECRET_ACHIEVEMENTS = [
     { id: 'perfect_timing', name: 'Perfect Timing', description: 'Make a trade with 50%+ profit', icon: '🎯', points: 100 },
     { id: 'diamond_portfolio', name: 'Diamond Portfolio', description: 'Hold 20 positions simultaneously', icon: '💎', points: 150 },
     { id: 'market_master', name: 'Market Master', description: '500 trades with 70%+ win rate', icon: '👑', points: 250 },
-    { id: 'prestige_hunter', name: 'Prestige Hunter', description: 'Prestige at least once', icon: '🌟', points: 200 },
     { id: 'achievement_hunter', name: 'Achievement Hunter', description: 'Unlock 10 secret achievements', icon: '🏆', points: 300 },
-    { id: 'legendary_trader', name: 'Legendary Trader', description: 'Reach Legend rank with $10M wealth', icon: '👑', points: 500 },
+    { id: 'legendary_trader', name: 'Legendary Trader', description: 'Reach Immortal I rank with $10M wealth', icon: '👑', points: 500 },
+    { id: 'infinite_trader', name: 'Infinite Trader', description: 'Reach the ultimate Infinite I rank', icon: '♾️', points: 1000 },
     { id: 'code_master', name: 'Code Master', description: 'Redeem all available codes', icon: '🎁', points: 50 }
 ];
 
@@ -349,9 +399,9 @@ const BADGES = [
     { id: 'profit_master', name: 'Profit Master', icon: '💰', condition: 'Make $500,000 total profit' },
     { id: 'rank_master', name: 'Rank Master', icon: '👑', condition: 'Reach Immortal rank' },
     { id: 'achievement_hunter', name: 'Achievement Hunter', icon: '🏆', condition: 'Unlock all secret achievements' },
-    { id: 'prestige_1', name: 'Prestige I', icon: '🌟', condition: 'Prestige once' },
-    { id: 'prestige_5', name: 'Prestige V', icon: '⭐', condition: 'Prestige 5 times' },
-    { id: 'prestige_10', name: 'Prestige X', icon: '✨', condition: 'Prestige 10 times' }
+    { id: 'divine_trader', name: 'Divine Trader', icon: '✨', condition: 'Reach Divine rank' },
+    { id: 'cosmic_lord', name: 'Cosmic Lord', icon: '🌌', condition: 'Reach Cosmic rank' },
+    { id: 'infinite_master', name: 'Infinite Master', icon: '♾️', condition: 'Reach Infinite rank' }
 ];
 
 const TITLES = [
@@ -361,12 +411,15 @@ const TITLES = [
     { id: 'master', name: 'The Master', condition: 'Reach Master rank' },
     { id: 'legend', name: 'The Legend', condition: 'Reach Legend rank' },
     { id: 'immortal', name: 'The Immortal', condition: 'Reach Immortal rank' },
+    { id: 'divine', name: 'The Divine', condition: 'Reach Divine rank' },
+    { id: 'cosmic', name: 'The Cosmic', condition: 'Reach Cosmic rank' },
+    { id: 'infinite', name: 'The Infinite', condition: 'Reach Infinite rank' },
     { id: 'millionaire', name: 'The Millionaire', condition: 'Reach $1,000,000 wealth' },
     { id: 'tycoon', name: 'The Tycoon', condition: 'Reach $5,000,000 wealth' },
+    { id: 'billionaire', name: 'The Billionaire', condition: 'Reach $1,000,000,000 wealth' },
     { id: 'market_maker', name: 'Market Maker', condition: 'Complete 500 trades' },
     { id: 'sector_specialist', name: 'Sector Specialist', condition: 'Make $50,000 in one sector' },
-    { id: 'comeback_kid', name: 'Comeback Kid', condition: 'Recover from -50% to positive' },
-    { id: 'prestige_master', name: 'Prestige Master', condition: 'Prestige 5 times' }
+    { id: 'comeback_kid', name: 'Comeback Kid', condition: 'Recover from -50% to positive' }
 ];
 
 // News Events
@@ -394,7 +447,7 @@ const POTIONS = {
         name: 'Speed Boost Potion',
         icon: '⚡',
         description: 'Doubles price update speed for 2 minutes',
-        price: 2000,
+        price: 20000,
         duration: 120000, // 2 minutes
         effect: 'speed'
     },
@@ -402,7 +455,7 @@ const POTIONS = {
         name: 'Profit Multiplier Potion',
         icon: '💰',
         description: '2x profit on all trades for 3 minutes',
-        price: 3000,
+        price: 30000,
         duration: 180000, // 3 minutes
         effect: 'profit'
     },
@@ -410,7 +463,7 @@ const POTIONS = {
         name: 'Luck Boost Potion',
         icon: '🍀',
         description: 'Increases chance of positive price movements for 2 minutes',
-        price: 2500,
+        price: 25000,
         duration: 120000, // 2 minutes
         effect: 'luck'
     },
@@ -418,7 +471,7 @@ const POTIONS = {
         name: 'Dividend Boost Potion',
         icon: '💎',
         description: '3x dividend payouts for 5 minutes',
-        price: 3500,
+        price: 35000,
         duration: 300000, // 5 minutes
         effect: 'dividend'
     }
@@ -431,9 +484,11 @@ const REDEEM_CODES = {
     'TUFFAHHSTOCKS': { type: 'money', amount: 10000, description: '$10,000 cash' },
     'WETHEBESTMUSIC': { type: 'money', amount: 10000, description: '$10,000 cash' },
     'lallorona': { type: 'money', amount: 10000, description: '$10,000 cash' },
+    'WEALLGOONTOKALEB': { type: 'money', amount: 10000, description: '$10,000 cash' },
     'instagramGOON': { type: 'money', amount: 10000, description: '$10,000 cash' },
     'potions': { type: 'potions', description: 'One of each potion' },
     'THISISWHYWETRADE': { type: 'money', amount: 67, description: '$67 cash' },
+    '1.0.2': { type: 'money', amount: 67, description: '$67 cash' },
     'CHEATS': { type: 'cheat_menu', description: 'Unlock cheat menu' }
 };
 

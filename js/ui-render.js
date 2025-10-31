@@ -453,8 +453,6 @@ function switchTab(tabName) {
         renderStatistics();
     } else if (tabName === 'achievements') {
         renderAchievements();
-    } else if (tabName === 'prestige') {
-        renderPrestige();
     } else if (tabName === 'progression') {
         renderMilestones();
     } else if (tabName === 'shop') {
@@ -941,119 +939,6 @@ function renderAchievements() {
     `;
 }
 
-// Render prestige
-function renderPrestige() {
-    const container = document.getElementById('prestigeContainer');
-    if (!container) return;
-
-    const prestigeLevel = gameState.prestigeLevel || 0;
-    const bonuses = gameState.prestigeBonuses || getPrestigeBonuses(0);
-    const canPrestigeNow = canPrestige();
-    const nextBonuses = getPrestigeBonuses(prestigeLevel + 1);
-
-    container.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="font-size: 64px; margin-bottom: 15px;">🌟</div>
-            <div style="font-size: 48px; font-weight: bold; color: #ffea00; margin-bottom: 10px;">
-                Prestige Level ${prestigeLevel}
-            </div>
-            <div style="color: #888; font-size: 16px;">
-                ${canPrestigeNow ? 'You can prestige now!' : 'Reach Immortal I rank to prestige'}
-            </div>
-        </div>
-
-        <div style="margin-bottom: 30px;">
-            <h3 style="color: #00f0ff; margin-bottom: 15px;">💎 Current Bonuses</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                <div class="stat-card">
-                    <div class="stat-label">Starting Capital Bonus</div>
-                    <div class="stat-value" style="color: #00ff88;">+${bonuses.startingCapitalBonus}%</div>
-                    <div class="stat-sublabel">${formatCurrency(STARTER_CAPITAL * (bonuses.startingCapitalBonus / 100))}</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-label">RP Multiplier</div>
-                    <div class="stat-value" style="color: #00f0ff;">${bonuses.rpMultiplier.toFixed(1)}x</div>
-                    <div class="stat-sublabel">+${((bonuses.rpMultiplier - 1) * 100).toFixed(0)}% RP gain</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-label">Trading Fee Reduction</div>
-                    <div class="stat-value" style="color: #b000ff;">${bonuses.tradingFeeReduction}%</div>
-                    <div class="stat-sublabel">Lower trading costs</div>
-                </div>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 30px;">
-            <h3 style="color: #00f0ff; margin-bottom: 15px;">⬆️ Next Level Bonuses</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                <div class="stat-card" style="opacity: 0.7;">
-                    <div class="stat-label">Starting Capital Bonus</div>
-                    <div class="stat-value" style="color: #00ff88;">+${nextBonuses.startingCapitalBonus}%</div>
-                    <div class="stat-sublabel">${formatCurrency(STARTER_CAPITAL * (nextBonuses.startingCapitalBonus / 100))}</div>
-                </div>
-
-                <div class="stat-card" style="opacity: 0.7;">
-                    <div class="stat-label">RP Multiplier</div>
-                    <div class="stat-value" style="color: #00f0ff;">${nextBonuses.rpMultiplier.toFixed(1)}x</div>
-                    <div class="stat-sublabel">+${((nextBonuses.rpMultiplier - 1) * 100).toFixed(0)}% RP gain</div>
-                </div>
-
-                <div class="stat-card" style="opacity: 0.7;">
-                    <div class="stat-label">Trading Fee Reduction</div>
-                    <div class="stat-value" style="color: #b000ff;">${nextBonuses.tradingFeeReduction}%</div>
-                    <div class="stat-sublabel">Lower trading costs</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="strategy-card" style="background: linear-gradient(135deg, rgba(255, 234, 0, 0.1), rgba(255, 136, 0, 0.1)); padding: 30px;">
-            <h3 style="color: #ffea00; margin-bottom: 15px; text-align: center;">⚠️ What Happens When You Prestige?</h3>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px;">
-                <div>
-                    <h4 style="color: #ff4444; margin-bottom: 10px;">❌ You Will Lose:</h4>
-                    <ul style="color: #888; line-height: 1.8;">
-                        <li>All money</li>
-                        <li>All active positions</li>
-                        <li>All ranks (reset to Novice III)</li>
-                        <li>All milestones</li>
-                        <li>All orders</li>
-                        <li>Win/Loss statistics</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 style="color: #00ff88; margin-bottom: 10px;">✅ You Will Keep:</h4>
-                    <ul style="color: #888; line-height: 1.8;">
-                        <li>Achievement Points</li>
-                        <li>Secret Achievements</li>
-                        <li>Login Streak</li>
-                        <li>Best/Worst Trade Records</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div style="text-align: center;">
-                <button
-                    class="btn ${canPrestigeNow ? 'btn-primary' : 'btn-secondary'}"
-                    onclick="prestige()"
-                    ${!canPrestigeNow ? 'disabled' : ''}
-                    style="font-size: 18px; padding: 15px 40px; ${!canPrestigeNow ? 'opacity: 0.5; cursor: not-allowed;' : ''}"
-                >
-                    🌟 PRESTIGE NOW 🌟
-                </button>
-                ${!canPrestigeNow ? `
-                    <div style="color: #888; margin-top: 15px; font-size: 14px;">
-                        Reach Immortal I rank (25,000 RP) to unlock prestige
-                    </div>
-                ` : ''}
-            </div>
-        </div>
-    `;
-}
-
 // Render settings
 function renderSettings() {
     const container = document.getElementById('settingsContainer');
@@ -1212,12 +1097,33 @@ function renderSettings() {
         </div>
 
         <!-- Danger Zone -->
-        <div style="background: rgba(255, 0, 0, 0.05); border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 12px; padding: 20px;">
-            <h3 style="color: #ff4444; margin-bottom: 15px;">⚠️ Danger Zone</h3>
-            <button class="btn btn-danger" onclick="resetGame()" style="background: #ff4444; color: #fff; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                🔄 Reset All Progress
+        <div style="background: rgba(255, 0, 0, 0.1); border: 2px solid rgba(255, 0, 0, 0.5); border-radius: 12px; padding: 25px;">
+            <h3 style="color: #ff4444; margin-bottom: 15px; font-size: 20px;">⚠️ DANGER ZONE ⚠️</h3>
+            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                <div style="color: #ff8888; font-size: 14px; margin-bottom: 10px; font-weight: bold;">
+                    ⚠️ WARNING: This action is PERMANENT and IRREVERSIBLE!
+                </div>
+                <div style="color: #aaa; font-size: 13px; line-height: 1.6;">
+                    Clicking this button will permanently delete:
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>All your money and investments</li>
+                        <li>All ranks, achievements, and milestones</li>
+                        <li>All unlocked themes, badges, and titles</li>
+                        <li>All potions, codes, and cheat menu access</li>
+                        <li>All trading history and statistics</li>
+                    </ul>
+                    You will start completely fresh with $100,000.
+                </div>
+            </div>
+            <button
+                class="btn btn-danger"
+                onclick="resetGame()"
+                style="background: #ff4444; color: #fff; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: all 0.3s;"
+                onmouseover="this.style.background='#ff0000'"
+                onmouseout="this.style.background='#ff4444'"
+            >
+                🔄 WIPE ALL DATA & RESET GAME
             </button>
-            <div style="color: #888; font-size: 12px; margin-top: 10px;">This will delete all your progress and start fresh. Cannot be undone!</div>
         </div>
     `;
 }
