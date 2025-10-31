@@ -11,6 +11,9 @@
         <!-- News Ticker -->
         <div id="newsTicker" class="news-ticker"></div>
 
+        <!-- Status Bar for Special Effects -->
+        <div id="statusBar" class="status-bar" style="display: none;"></div>
+
         <!-- Header -->
         <div class="header">
             <div class="logo">67 Labs</div>
@@ -50,13 +53,77 @@
             <div class="tab" onclick="switchTab('portfolio')">💼 Portfolio</div>
             <div class="tab" onclick="switchTab('analytics')">📊 Analytics</div>
             <div class="tab" onclick="switchTab('progression')">🏅 Progression</div>
-            <div class="tab" onclick="switchTab('achievements')">🏆 Achievements</div>
             <div class="tab" onclick="switchTab('shop')">🛒 Shop & Codes</div>
+            <div class="tab" onclick="switchTab('prestige')">🔄 Prestige</div>
             <div class="tab" onclick="switchTab('settings')">⚙️ Settings</div>
         </div>
 
         <!-- Tab Contents -->
         <div id="trading" class="tab-content active">
+            <!-- Trading Controls -->
+            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <!-- Search and Sort -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="stockSearch" placeholder="🔍 Search..."
+                        style="padding: 10px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px; color: #e0e0e0;"
+                        oninput="handleStockSearch(this.value)">
+                    <select id="stockSortBy" onchange="handleStockSort()"
+                        style="padding: 10px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px; color: #e0e0e0;">
+                        <option value="symbol">Symbol</option>
+                        <option value="price">Price</option>
+                        <option value="change">Change %</option>
+                        <option value="sector">Sector</option>
+                    </select>
+                    <button id="stockSortOrder" onclick="toggleSortOrder()"
+                        style="padding: 10px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px; color: #00f0ff; cursor: pointer;">
+                        ⬆️ Asc
+                    </button>
+                </div>
+
+                <!-- Asset Type Selector -->
+                <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button onclick="showAssetType('stocks')" id="assetBtn-stocks" class="btn btn-secondary" style="font-size: 13px; padding: 8px 12px;">📈 Stocks</button>
+                    <button onclick="showAssetType('crypto')" id="assetBtn-crypto" class="btn btn-secondary" style="font-size: 13px; padding: 8px 12px;">₿ Crypto</button>
+                    <button onclick="showAssetType('forex')" id="assetBtn-forex" class="btn btn-secondary" style="font-size: 13px; padding: 8px 12px;">💱 Forex</button>
+                    <button onclick="showAssetType('commodities')" id="assetBtn-commodities" class="btn btn-secondary" style="font-size: 13px; padding: 8px 12px;">🌾 Commodities</button>
+                    <button onclick="showAssetType('bonds')" id="assetBtn-bonds" class="btn btn-secondary" style="font-size: 13px; padding: 8px 12px;">📜 Bonds</button>
+                </div>
+
+                <!-- Advanced Trading Features (Collapsible) -->
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #00f0ff; font-weight: bold; padding: 10px; background: rgba(0, 240, 255, 0.05); border-radius: 8px;">
+                        🚀 Advanced Trading Features
+                    </summary>
+                    <div style="padding: 15px; margin-top: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                            <button onclick="enableMarginTrading()" class="btn btn-secondary" style="font-size: 12px;">📊 Margin Trading</button>
+                            <button onclick="enableShortSelling()" class="btn btn-secondary" style="font-size: 12px;">📉 Short Selling</button>
+                            <button onclick="enableOptionsTrading()" class="btn btn-secondary" style="font-size: 12px;">📊 Options</button>
+                            <button onclick="enableAfterHoursTrading()" class="btn btn-secondary" style="font-size: 12px;">🌙 After-Hours</button>
+                        </div>
+
+                        <!-- Margin/Leverage Controls -->
+                        <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
+                            <select id="leverageSelect" onchange="setLeverage(parseInt(this.value))"
+                                style="flex: 1; padding: 8px; background: rgba(176, 0, 255, 0.1); border: 1px solid rgba(176, 0, 255, 0.3); border-radius: 8px; color: #b000ff; font-size: 12px;">
+                                <option value="1">1x Leverage</option>
+                                <option value="2">2x Leverage</option>
+                                <option value="5">5x Leverage</option>
+                                <option value="10">10x Leverage ⚠️</option>
+                            </select>
+                            <div id="marginDebtDisplay" style="flex: 1; text-align: center; color: #ff4444; font-weight: bold; font-size: 12px;">
+                                Debt: $0
+                            </div>
+                        </div>
+
+                        <!-- Active Positions -->
+                        <div id="shortPositionsDisplay" style="margin-top: 10px;"></div>
+                        <div id="optionsDisplay" style="margin-top: 10px;"></div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Asset Grid -->
             <div class="nodes-grid" id="tradingGrid"></div>
         </div>
 
@@ -105,16 +172,11 @@
             </div>
         </div>
 
-        <div id="achievements" class="tab-content">
-            <h2 style="color: #00f0ff; margin-bottom: 20px;">🏆 Achievements</h2>
-            <div id="achievementsContainer"></div>
-        </div>
-
         <div id="progression" class="tab-content">
-            <h2 style="color: #00f0ff; margin-bottom: 20px; text-align: center;">🏅 Progression & Ranks</h2>
+            <h2 style="color: #00f0ff; margin-bottom: 20px; text-align: center;">🏅 Progression & Achievements</h2>
 
             <!-- Current Rank Display -->
-            <div class="tier-display" style="margin-bottom: 30px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(176, 0, 255, 0.1));">
+            <div class="tier-display" style="margin-bottom: 30px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(176, 0, 255, 0.1)); cursor: pointer;" onclick="toggleAllRanksDisplay()">
                 <div style="text-align: center; color: #00f0ff; font-size: 14px; margin-bottom: 10px; font-weight: bold;">YOUR CURRENT RANK</div>
                 <div class="tier-icon" id="rankIconLarge" style="font-size: 64px;">🔰</div>
                 <div class="tier-name" id="rankNameLarge" style="font-size: 28px; margin-bottom: 10px;">Novice III</div>
@@ -127,6 +189,15 @@
                 <div class="progress-bar" style="height: 12px;">
                     <div class="progress-fill" id="rankProgressBarLarge" style="width: 0%; background: linear-gradient(90deg, #00f0ff, #b000ff);"></div>
                 </div>
+                <div style="text-align: center; color: #00f0ff; font-size: 12px; margin-top: 15px; opacity: 0.7;">
+                    👆 Click to view all ranks
+                </div>
+            </div>
+
+            <!-- All Ranks Display (Collapsible) -->
+            <div id="allRanksContainer" style="display: none; margin-bottom: 30px;">
+                <h3 style="color: #00f0ff; margin-bottom: 15px;">🏆 All Ranks</h3>
+                <div id="allRanksDisplay"></div>
             </div>
 
             <!-- Wealth Tier Display -->
@@ -159,7 +230,7 @@
                         </div>
                     </div>
                     <div>
-                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 5px;">Achievements</div>
+                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 5px;">Milestones</div>
                         <div style="color: #888; font-size: 13px; line-height: 1.6;">
                             • Unlock milestone: <span style="color: #00f0ff;">+20 RP</span><br>
                             • Trade in new sector: <span style="color: #00f0ff;">+15 RP</span>
@@ -168,15 +239,9 @@
                 </div>
             </div>
 
-            <!-- Milestone Unlocks -->
-            <div class="section-title">Milestone Unlocks</div>
+            <!-- Milestone Achievements -->
+            <div class="section-title">🎯 Milestone Achievements</div>
             <div class="milestones-grid" id="milestonesGrid"></div>
-
-            <!-- All Ranks Display -->
-            <div style="margin-top: 30px;">
-                <h3 style="color: #00f0ff; margin-bottom: 15px;">🏆 All Ranks</h3>
-                <div id="allRanksDisplay"></div>
-            </div>
         </div>
 
         <div id="shop" class="tab-content">
@@ -187,8 +252,22 @@
             <div id="codesContainer"></div>
         </div>
 
+        <div id="prestige" class="tab-content">
+            <div id="prestigeDisplay"></div>
+        </div>
+
         <div id="settings" class="tab-content">
             <h2 style="color: #00f0ff; margin-bottom: 20px;">⚙️ Settings & Customization</h2>
+
+            <!-- Difficulty Mode Selection -->
+            <div style="background: rgba(255, 68, 68, 0.1); border: 2px solid rgba(255, 68, 68, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                <h3 style="color: #ff4444; margin-bottom: 15px;">⚠️ Difficulty Mode (Requires Reset)</h3>
+                <div style="color: #888; margin-bottom: 20px;">
+                    Changing difficulty will reset your game progress (except prestige data)
+                </div>
+                <div id="difficultySelector"></div>
+            </div>
+
             <div id="settingsContainer"></div>
         </div>
     </div>
@@ -322,6 +401,74 @@
                     </div>
                 </div>
 
+                <!-- Market Manipulation -->
+                <div style="background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #ff4444; margin-bottom: 10px;">📊 Market Manipulation</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatTriggerBullMarket()">📈 Bull Market</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerBearMarket()">📉 Bear Market</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerRecession()">💔 Recession</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerRecovery()">💚 Recovery</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerInsiderTip()">🕵️ Insider Tip</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerIPO()">🎉 Trigger IPO</button>
+                    </div>
+                </div>
+
+                <!-- Economic Controls -->
+                <div style="background: rgba(176, 0, 255, 0.1); border: 1px solid rgba(176, 0, 255, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #b000ff; margin-bottom: 10px;">💹 Economic Controls</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatSetInterestRate()">📊 Set Interest Rate</button>
+                        <button class="btn btn-secondary" onclick="cheatSetInflation()">💸 Set Inflation</button>
+                        <button class="btn btn-secondary" onclick="cheatSetGDP()">📈 Set GDP Growth</button>
+                        <button class="btn btn-secondary" onclick="cheatSetUnemployment()">👥 Set Unemployment</button>
+                    </div>
+                </div>
+
+                <!-- Prestige & Unlocks -->
+                <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #00ff88; margin-bottom: 10px;">🔄 Prestige & Unlocks</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatAddPrestigeLevel()">⭐ +1 Prestige Level</button>
+                        <button class="btn btn-secondary" onclick="cheatUnlockAllStocks()">🔓 Unlock All Stocks</button>
+                        <button class="btn btn-secondary" onclick="cheatUnlockExclusiveStocks()">💎 Unlock Exclusive</button>
+                        <button class="btn btn-secondary" onclick="cheatRemoveTaxes()">💰 Remove Taxes</button>
+                    </div>
+                </div>
+
+                <!-- Special Effects -->
+                <div style="background: rgba(255, 0, 229, 0.1); border: 1px solid rgba(255, 0, 229, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #ff00e5; margin-bottom: 10px;">✨ Special Effects</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatTriggerNews()">📰 Trigger News</button>
+                        <button class="btn btn-secondary" onclick="cheatRemoveBadLuck()">✨ Remove Bad Luck</button>
+                        <button class="btn btn-secondary" onclick="cheatClearMarginDebt()">💰 Clear Margin Debt</button>
+                        <button class="btn btn-secondary" onclick="cheatUnlockAllAchievements()">🏆 All Achievements</button>
+                    </div>
+                </div>
+
+                <!-- Advanced Trading -->
+                <div style="background: rgba(255, 100, 0, 0.1); border: 1px solid rgba(255, 100, 0, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #ff6400; margin-bottom: 10px;">🚀 Advanced Trading</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatEnableAllTrading()">🔓 Enable All Trading</button>
+                        <button class="btn btn-secondary" onclick="cheatAddCrypto()">₿ Add Crypto</button>
+                        <button class="btn btn-secondary" onclick="cheatClearShorts()">📉 Clear Shorts</button>
+                        <button class="btn btn-secondary" onclick="cheatClearOptions()">📊 Clear Options</button>
+                    </div>
+                </div>
+
+                <!-- World Events -->
+                <div style="background: rgba(0, 255, 200, 0.1); border: 1px solid rgba(0, 255, 200, 0.3); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: #00ffc8; margin-bottom: 10px;">🌍 World Events</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="cheatTriggerEarnings()">📊 Trigger Earnings</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerDividend()">💰 Trigger Dividend</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerMerger()">🤝 Trigger M&A</button>
+                        <button class="btn btn-secondary" onclick="cheatTriggerSplit()">🔄 Trigger Split</button>
+                    </div>
+                </div>
+
                 <div style="text-align: center; color: #888; font-size: 12px;">
                     ⚠️ Using cheats may affect game balance
                 </div>
@@ -366,6 +513,12 @@
     <script src="js/events.js"></script>
     <script src="js/shop.js"></script>
     <script src="js/progression.js"></script>
+    <script src="js/prestige.js"></script>
+    <script src="js/advanced-features.js"></script>
+    <script src="js/news-and-features.js"></script>
+    <script src="js/trading-mechanics.js"></script>
+    <script src="js/world-events.js"></script>
+    <script src="js/advanced-trading-ui.js"></script>
     <script src="js/themes.js"></script>
     <script src="js/ui-helpers.js"></script>
     <script src="js/charts.js"></script>

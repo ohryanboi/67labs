@@ -7,15 +7,65 @@ const STARTER_CAPITAL = 100000;
 // Change the version number and update notes below
 // The update log will show every time the game loads
 const UPDATE_LOG = {
-    version: "1.0.2",
+    version: "2.0.0",
     date: "2025-10-31",
-    title: "67 Labs Update 1.0.2 THE RANKS UPDATE",
+    title: "67 Labs Update 2.0.0 - BIGGEST UPDATE YET!",
     updates: [
-        "ADDED 10 NEW RANKS",
-        "removed prestige ;(((( LLLL",
-        "thats it lmao",
-        "bug fixes",
-        "use code 1.0.2"
+        "SHORT SELLING",
+        "OPTIONS TRADING",
+        "CRYPTOCURRENCY",
+        "FOREX TRADING",
+        "COMMODITIES",
+        "BONDS",
+        "AFTER-HOURS TRADING",
+        "EARNINGS SEASONS",
+        "DIVIDEND SYSTEM",
+        "STOCK SPLITS",
+        "MERGERS & ACQUISITIONS",
+        "BANKRUPTCIES",
+        "REGULATORY EVENTS",
+        "GLOBAL MARKETS",
+        "MARKET CYCLES",
+        "TAX SYSTEM",
+        "DIFFICULTY MODES",
+        "PRESTIGE/REBIRTH SYSTEM",
+        "SECTOR CORRELATIONS",
+        "ECONOMIC INDICATORS",
+        "INSIDER TRADING EVENTS",
+        "UNLOCKABLE STOCKS",
+        "STOCK IPOS",
+        "INSIDER VISION POTION",
+        "LOSS PROTECTION POTION",
+        "TIME FREEZE POTION",
+        "VOLATILITY BOMB POTION",
+        "DIAMOND HANDS POTION",
+        "MARKET CRASH POTION",
+        "BULL RUN POTION",
+        "POTION COMBOS",
+        "FLASH CRASHES",
+        "HACKS",
+        "LAWSUITS",
+        "MARKET HALTS",
+        "BROKER OUTAGES",
+        "BAD LUCK CURSE",
+        "TRADING BAN",
+        "ACCOUNT FREEZE",
+        "MARGIN TRADING",
+        "LEVERAGE SYSTEM",
+        "DEBT SYSTEM",
+        "MARGIN CALLS",
+        "AUTO-LIQUIDATION",
+        "NEWS SENTIMENT ANALYSIS",
+        "ACHIEVEMENT CHAINS",
+        "60-RANK SYSTEM",
+        "STOCK SORTING",
+        "STOCK SEARCH",
+        "COMBINED TRADING INTERFACE",
+        "ASSET TYPE SELECTOR",
+        "CHARTS FOR ALL ASSETS",
+        "ADVANCED TRADING CHEATS",
+        "WORLD EVENTS CHEATS",
+        "MARKET MANIPULATION CHEATS",
     ],
     showOnLoad: true // Set to false to disable the update log popup
 };
@@ -474,7 +524,285 @@ const POTIONS = {
         price: 35000,
         duration: 300000, // 5 minutes
         effect: 'dividend'
+    },
+    insiderVision: {
+        name: 'Insider Vision Potion',
+        icon: '🔮',
+        description: 'See future price movements for 30 seconds',
+        price: 50000,
+        duration: 30000, // 30 seconds
+        effect: 'insider'
+    },
+    lossProtection: {
+        name: 'Loss Protection Potion',
+        icon: '🛡️',
+        description: 'Next 3 trades cannot lose money',
+        price: 75000,
+        duration: null, // Lasts for 3 trades
+        effect: 'protection',
+        charges: 3
+    },
+    timeFreeze: {
+        name: 'Time Freeze Potion',
+        icon: '⏰',
+        description: 'Pause all price movements for 1 minute',
+        price: 40000,
+        duration: 60000, // 1 minute
+        effect: 'freeze'
+    },
+    volatilityBomb: {
+        name: 'Volatility Bomb Potion',
+        icon: '🎲',
+        description: 'Extreme price swings for 2 minutes (high risk/reward)',
+        price: 35000,
+        duration: 120000, // 2 minutes
+        effect: 'volatility'
+    },
+    diamondHands: {
+        name: 'Diamond Hands Potion',
+        icon: '💎',
+        description: 'Lock all positions for 5 min, guaranteed 10% profit',
+        price: 100000,
+        duration: 300000, // 5 minutes
+        effect: 'diamond'
+    },
+    marketCrash: {
+        name: 'Market Crash Potion',
+        icon: '🔥',
+        description: 'All stocks drop 20% instantly (use before shorting)',
+        price: 80000,
+        duration: null, // Instant effect
+        effect: 'crash'
+    },
+    bullRun: {
+        name: 'Bull Run Potion',
+        icon: '📈',
+        description: 'All stocks rise 15% for 2 minutes',
+        price: 90000,
+        duration: 120000, // 2 minutes
+        effect: 'bull'
     }
+};
+
+// Potion Combos - Special effects when multiple potions are active
+const POTION_COMBOS = {
+    goldenHour: {
+        name: 'Golden Hour',
+        icon: '✨',
+        description: 'Speed + Luck = Ultra-fast lucky trades!',
+        requiredPotions: ['speedBoost', 'luckBoost'],
+        bonusEffect: 'Prices update 3x faster with 2x luck boost'
+    },
+    perfectStorm: {
+        name: 'Perfect Storm',
+        icon: '⚡',
+        description: 'Volatility + Profit = Extreme gains!',
+        requiredPotions: ['volatilityBomb', 'profitMultiplier'],
+        bonusEffect: '3x profit multiplier on volatile trades'
+    },
+    safeHaven: {
+        name: 'Safe Haven',
+        icon: '🛡️',
+        description: 'Protection + Dividend = Risk-free income',
+        requiredPotions: ['lossProtection', 'dividendBoost'],
+        bonusEffect: '5x dividends with no trade risk'
+    },
+    marketMaster: {
+        name: 'Market Master',
+        icon: '👑',
+        description: 'Bull Run + Insider Vision = Perfect timing',
+        requiredPotions: ['bullRun', 'insiderVision'],
+        bonusEffect: 'See future prices during bull market'
+    }
+};
+
+// Bad Random Events - Make the game harder!
+const BAD_EVENTS = [
+    {
+        id: 'flash_crash',
+        name: 'Flash Crash',
+        icon: '💥',
+        description: 'A random stock suddenly crashes 30%!',
+        probability: 0.01, // 1% chance per update
+        execute: (gameState) => {
+            const node = EQUITY_NODES[Math.floor(Math.random() * EQUITY_NODES.length)];
+            node.currentPrice *= 0.70; // 30% drop
+            node.trend = -0.9;
+            return `💥 FLASH CRASH! ${node.symbol} plummeted 30%!`;
+        }
+    },
+    {
+        id: 'hack',
+        name: 'Security Breach',
+        icon: '🔓',
+        description: 'Hackers steal 10% of your cash reserves!',
+        probability: 0.005, // 0.5% chance
+        execute: (gameState) => {
+            const stolen = gameState.digitalReserve * 0.10;
+            gameState.digitalReserve -= stolen;
+            return `🔓 SECURITY BREACH! Hackers stole ${formatCurrency(stolen)}!`;
+        }
+    },
+    {
+        id: 'lawsuit',
+        name: 'Lawsuit',
+        icon: '⚖️',
+        description: 'Legal troubles! Pay a fine between $5k-$50k',
+        probability: 0.008, // 0.8% chance
+        execute: (gameState) => {
+            const fine = 5000 + Math.random() * 45000;
+            gameState.digitalReserve -= fine;
+            return `⚖️ LAWSUIT! You must pay a fine of ${formatCurrency(fine)}!`;
+        }
+    },
+    {
+        id: 'market_halt',
+        name: 'Market Halt',
+        icon: '🚫',
+        description: 'Trading suspended for 2 minutes!',
+        probability: 0.002, // 0.2% chance (rarer)
+        execute: (gameState) => {
+            gameState.tradingHalted = true;
+            gameState.haltEndTime = Date.now() + 120000; // 2 minutes (shorter)
+            return `🚫 MARKET HALT! Trading suspended for 2 minutes!`;
+        }
+    },
+    {
+        id: 'broker_outage',
+        name: 'Broker Outage',
+        icon: '⚠️',
+        description: 'Technical difficulties! Cannot trade for 3 minutes',
+        probability: 0.007, // 0.7% chance
+        execute: (gameState) => {
+            gameState.brokerOutage = true;
+            gameState.outageEndTime = Date.now() + 180000; // 3 minutes
+            return `⚠️ BROKER OUTAGE! System down for 3 minutes!`;
+        }
+    }
+];
+
+// Market Cycles System
+const MARKET_CYCLES = {
+    bull: {
+        name: 'Bull Market',
+        icon: '📈',
+        description: 'Prices trending upward',
+        priceMultiplier: 1.3, // 30% boost to upward movement
+        duration: 180000, // 3 minutes
+        probability: 0.15 // 15% chance to start
+    },
+    bear: {
+        name: 'Bear Market',
+        icon: '📉',
+        description: 'Prices trending downward',
+        priceMultiplier: 1.3, // 30% boost to downward movement
+        duration: 180000, // 3 minutes
+        probability: 0.12 // 12% chance to start
+    },
+    recession: {
+        name: 'Recession',
+        icon: '💔',
+        description: 'Economic downturn - severe losses',
+        priceImpact: -0.40, // 40% drop
+        duration: 300000, // 5 minutes
+        probability: 0.03 // 3% chance to start
+    },
+    recovery: {
+        name: 'Recovery Phase',
+        icon: '💚',
+        description: 'Slow climb back up',
+        priceMultiplier: 1.15, // 15% boost to upward movement
+        duration: 240000, // 4 minutes
+        probability: 0.10 // 10% chance to start (higher after recession)
+    },
+    neutral: {
+        name: 'Neutral Market',
+        icon: '➡️',
+        description: 'Normal market conditions',
+        priceMultiplier: 1.0,
+        duration: null,
+        probability: 0
+    }
+};
+
+// Tax System
+const TAX_RATES = {
+    none: { rate: 0, name: 'No Tax', description: 'Tax-free trading' },
+    low: { rate: 0.15, name: 'Low Tax', description: '15% capital gains tax' },
+    medium: { rate: 0.20, name: 'Medium Tax', description: '20% capital gains tax' },
+    high: { rate: 0.30, name: 'High Tax', description: '30% capital gains tax' }
+};
+
+// Difficulty Modes
+const DIFFICULTY_MODES = {
+    easy: {
+        name: 'Easy Mode',
+        icon: '😊',
+        startingCapital: 100000,
+        volatilityMultiplier: 1.0,
+        badEventMultiplier: 0.5, // 50% less bad events
+        taxRate: 'none',
+        description: 'Relaxed gameplay, perfect for learning'
+    },
+    normal: {
+        name: 'Normal Mode',
+        icon: '😐',
+        startingCapital: 50000,
+        volatilityMultiplier: 1.3,
+        badEventMultiplier: 1.0,
+        taxRate: 'low',
+        description: 'Balanced challenge'
+    },
+    hard: {
+        name: 'Hard Mode',
+        icon: '😰',
+        startingCapital: 25000,
+        volatilityMultiplier: 1.6,
+        badEventMultiplier: 1.5, // 50% more bad events
+        taxRate: 'medium',
+        description: 'Serious challenge with higher stakes'
+    },
+    nightmare: {
+        name: 'Nightmare Mode',
+        icon: '💀',
+        startingCapital: 10000,
+        volatilityMultiplier: 2.0,
+        badEventMultiplier: 2.0, // 2x bad events
+        taxRate: 'high',
+        bankruptcyChance: 0.01, // 1% chance of stock bankruptcy
+        description: 'Extreme difficulty - only for masters'
+    }
+};
+
+// Prestige System
+const PRESTIGE_BONUSES = {
+    1: { profitBonus: 0.05, title: 'Reborn Trader', badge: '🔄', unlocks: [] },
+    2: { profitBonus: 0.10, title: 'Veteran Trader', badge: '🔄🔄', unlocks: ['exclusive_tech'] },
+    3: { profitBonus: 0.15, title: 'Elite Trader', badge: '🔄🔄🔄', unlocks: ['exclusive_tech', 'exclusive_finance'] },
+    4: { profitBonus: 0.20, title: 'Master Trader', badge: '🔄⭐', unlocks: ['exclusive_tech', 'exclusive_finance', 'exclusive_crypto'] },
+    5: { profitBonus: 0.25, title: 'Legendary Trader', badge: '🔄👑', unlocks: ['exclusive_tech', 'exclusive_finance', 'exclusive_crypto', 'exclusive_quantum'] },
+    10: { profitBonus: 0.50, title: 'Transcendent Trader', badge: '🔄💎', unlocks: ['all_exclusive'] },
+    25: { profitBonus: 1.00, title: 'Immortal Trader', badge: '🔄♾️', unlocks: ['all_exclusive', 'god_mode'] }
+};
+
+// Exclusive stocks unlocked through prestige
+const EXCLUSIVE_STOCKS = {
+    exclusive_tech: [
+        { symbol: 'QNTM', name: 'Quantum Computing Corp', sector: 'Technology', basePrice: 500, volatility: 'extreme', dividendYield: 0.01 },
+        { symbol: 'NANO', name: 'Nanotech Industries', sector: 'Technology', basePrice: 350, volatility: 'high', dividendYield: 0.015 }
+    ],
+    exclusive_finance: [
+        { symbol: 'CRYPT', name: 'CryptoBank Global', sector: 'Finance', basePrice: 450, volatility: 'extreme', dividendYield: 0.02 },
+        { symbol: 'HEDGE', name: 'Mega Hedge Fund', sector: 'Finance', basePrice: 600, volatility: 'high', dividendYield: 0.025 }
+    ],
+    exclusive_crypto: [
+        { symbol: 'BTCX', name: 'Bitcoin Exchange', sector: 'Technology', basePrice: 800, volatility: 'extreme', dividendYield: 0.005 },
+        { symbol: 'ETHX', name: 'Ethereum Platform', sector: 'Technology', basePrice: 700, volatility: 'extreme', dividendYield: 0.008 }
+    ],
+    exclusive_quantum: [
+        { symbol: 'QBIT', name: 'Quantum Bit Systems', sector: 'Technology', basePrice: 1000, volatility: 'extreme', dividendYield: 0.01 },
+        { symbol: 'ATOM', name: 'Atomic Computing', sector: 'Technology', basePrice: 900, volatility: 'extreme', dividendYield: 0.012 }
+    ]
 };
 
 // Redeem Codes
@@ -486,9 +814,348 @@ const REDEEM_CODES = {
     'lallorona': { type: 'money', amount: 10000, description: '$10,000 cash' },
     'WEALLGOONTOKALEB': { type: 'money', amount: 10000, description: '$10,000 cash' },
     'instagramGOON': { type: 'money', amount: 10000, description: '$10,000 cash' },
-    'potions': { type: 'potions', description: 'One of each potion' },
+    'potions': { type: 'potions', description: 'Potions!' },
     'THISISWHYWETRADE': { type: 'money', amount: 67, description: '$67 cash' },
     '1.0.2': { type: 'money', amount: 67, description: '$67 cash' },
+    '1.0.7': { type: 'advanced_trading', description: 'Unlock all advanced trading features!' },
     'CHEATS': { type: 'cheat_menu', description: 'Unlock cheat menu' }
+};
+
+// ========================================
+// NEW FEATURES - SECTOR CORRELATIONS, ECONOMIC INDICATORS, INSIDER TRADING, IPOS
+// ========================================
+
+// Sector Correlations - When one sector moves, related stocks move together
+const SECTOR_CORRELATIONS = {
+    Technology: 0.7, // 70% correlation within tech stocks
+    Finance: 0.6,
+    Healthcare: 0.5,
+    Energy: 0.8, // Energy stocks highly correlated
+    'Consumer Goods': 0.4,
+    Industrial: 0.5,
+    Retail: 0.6
+};
+
+// Economic Indicators - Affect all stock prices
+const ECONOMIC_INDICATORS = {
+    interestRate: {
+        current: 0.05, // 5%
+        min: 0.01,
+        max: 0.15,
+        changeChance: 0.02, // 2% chance per update
+        impact: -0.5, // Higher rates = lower stock prices
+        description: 'Federal Interest Rate'
+    },
+    inflation: {
+        current: 0.03, // 3%
+        min: 0.01,
+        max: 0.10,
+        changeChance: 0.01,
+        cashImpact: -0.0001, // Reduces cash value over time
+        description: 'Inflation Rate'
+    },
+    gdpGrowth: {
+        current: 0.03, // 3% growth
+        min: -0.05,
+        max: 0.08,
+        changeChance: 0.015,
+        impact: 0.3, // Higher GDP = higher stock prices
+        description: 'GDP Growth Rate'
+    },
+    unemployment: {
+        current: 0.04, // 4%
+        min: 0.02,
+        max: 0.12,
+        changeChance: 0.01,
+        consumerImpact: -0.4, // Higher unemployment = lower consumer stocks
+        description: 'Unemployment Rate'
+    }
+};
+
+// Insider Trading Events
+const INSIDER_EVENTS = {
+    probability: 0.005, // 0.5% chance per update
+    penaltyChance: 0.30, // 30% chance of getting caught
+    penaltyAmount: { min: 10000, max: 100000 },
+    profitMultiplier: { min: 1.5, max: 3.0 }, // 1.5x to 3x profit if you act on it
+    duration: 30000 // 30 seconds to act
+};
+
+// Stock IPOs (Initial Public Offerings)
+const IPO_CONFIG = {
+    probability: 0.001, // 0.1% chance per update
+    initialPriceRange: { min: 50, max: 500 },
+    successChance: 0.40, // 40% become winners, 60% flop
+    winnerMultiplier: { min: 2.0, max: 10.0 }, // 2x to 10x gains
+    flopMultiplier: { min: 0.1, max: 0.5 }, // Lose 50-90% of value
+    duration: 120000 // 2 minutes before price stabilizes
+};
+
+// Unlockable Stocks System
+const STOCK_UNLOCK_REQUIREMENTS = {
+    // Initial stocks (always available)
+    initial: ['TECH-A', 'FIN-A', 'HLTH-A', 'ENRG-A', 'CONS-A', 'IND-A', 'RET-A', 'TECH-B', 'FIN-B', 'HLTH-B'],
+
+    // Unlock by wealth milestones
+    wealth_100k: ['ENRG-B', 'CONS-B'],
+    wealth_500k: ['IND-B', 'RET-B'],
+    wealth_1M: ['TECH-C', 'FIN-C'],
+    wealth_5M: ['HLTH-C', 'ENRG-C'],
+    wealth_10M: ['CONS-C', 'IND-C'],
+
+    // Unlock by rank
+    rank_5: ['RET-C'],
+    rank_10: ['TECH-D'],
+    rank_15: ['FIN-D'],
+    rank_20: ['HLTH-D'],
+
+    // Unlock by completing challenges
+    challenge_10_trades: ['ENRG-D'],
+    challenge_100_trades: ['CONS-D'],
+    challenge_1000_trades: ['IND-D']
+};
+
+// News Sentiment Analysis
+const NEWS_SENTIMENT = {
+    positive: {
+        keywords: ['surge', 'breakthrough', 'record', 'profit', 'growth', 'innovation', 'success', 'expansion'],
+        priceImpact: { min: 0.05, max: 0.15 }, // 5-15% increase
+        duration: 60000 // 1 minute
+    },
+    negative: {
+        keywords: ['crash', 'scandal', 'loss', 'decline', 'lawsuit', 'failure', 'bankruptcy', 'investigation'],
+        priceImpact: { min: -0.15, max: -0.05 }, // 5-15% decrease
+        duration: 60000
+    },
+    neutral: {
+        keywords: ['announces', 'reports', 'updates', 'statement', 'meeting'],
+        priceImpact: { min: -0.02, max: 0.02 }, // ±2%
+        duration: 30000
+    }
+};
+
+// Achievement Chains
+const ACHIEVEMENT_CHAINS = {
+    trader_progression: {
+        name: 'Trader Progression',
+        icon: '📈',
+        steps: [
+            { id: 'novice_trader', name: 'Novice Trader', requirement: 'Complete 10 trades', reward: 100, check: () => (gameState.totalTrades || 0) >= 10 },
+            { id: 'skilled_trader', name: 'Skilled Trader', requirement: 'Complete 50 trades', reward: 500, check: () => (gameState.totalTrades || 0) >= 50 },
+            { id: 'expert_trader', name: 'Expert Trader', requirement: 'Complete 200 trades', reward: 2000, check: () => (gameState.totalTrades || 0) >= 200 },
+            { id: 'master_trader', name: 'Master Trader', requirement: 'Complete 1000 trades', reward: 10000, check: () => (gameState.totalTrades || 0) >= 1000 }
+        ]
+    },
+    wealth_builder: {
+        name: 'Wealth Builder',
+        icon: '💰',
+        steps: [
+            { id: 'first_100k', name: 'First $100K', requirement: 'Reach $100,000', reward: 200, check: () => calculateWealthZoneScore() >= 100000 },
+            { id: 'half_million', name: 'Half Millionaire', requirement: 'Reach $500,000', reward: 1000, check: () => calculateWealthZoneScore() >= 500000 },
+            { id: 'millionaire', name: 'Millionaire', requirement: 'Reach $1,000,000', reward: 5000, check: () => calculateWealthZoneScore() >= 1000000 },
+            { id: 'multi_millionaire', name: 'Multi-Millionaire', requirement: 'Reach $10,000,000', reward: 50000, check: () => calculateWealthZoneScore() >= 10000000 }
+        ]
+    },
+    profit_master: {
+        name: 'Profit Master',
+        icon: '💎',
+        steps: [
+            { id: 'first_profit', name: 'First Profit', requirement: 'Make $10,000 profit on one trade', reward: 150, check: () => gameState.bestTrade && gameState.bestTrade.profit >= 10000 },
+            { id: 'big_profit', name: 'Big Profit', requirement: 'Make $100,000 profit on one trade', reward: 1500, check: () => gameState.bestTrade && gameState.bestTrade.profit >= 100000 },
+            { id: 'huge_profit', name: 'Huge Profit', requirement: 'Make $1,000,000 profit on one trade', reward: 15000, check: () => gameState.bestTrade && gameState.bestTrade.profit >= 1000000 },
+            { id: 'legendary_profit', name: 'Legendary Profit', requirement: 'Make $10,000,000 profit on one trade', reward: 100000, check: () => gameState.bestTrade && gameState.bestTrade.profit >= 10000000 }
+        ]
+    },
+    news_trader: {
+        name: 'News Trader',
+        icon: '📰',
+        steps: [
+            { id: 'news_aware', name: 'News Aware', requirement: 'Trade during 5 news events', reward: 100, check: () => (gameState.newsTradesCount || 0) >= 5 },
+            { id: 'news_follower', name: 'News Follower', requirement: 'Trade during 25 news events', reward: 500, check: () => (gameState.newsTradesCount || 0) >= 25 },
+            { id: 'news_expert', name: 'News Expert', requirement: 'Trade during 100 news events', reward: 2500, check: () => (gameState.newsTradesCount || 0) >= 100 },
+            { id: 'news_master', name: 'News Master', requirement: 'Trade during 500 news events', reward: 15000, check: () => (gameState.newsTradesCount || 0) >= 500 }
+        ]
+    }
+};
+
+// Bad Luck Mechanics
+const BAD_LUCK_CONFIG = {
+    curseChance: 0.05, // 5% chance after big win
+    curseDuration: 120000, // 2 minutes
+    bigWinThreshold: 50000, // $50k profit triggers curse check
+
+    tradingBanChance: 0.10, // 10% chance on violations
+    tradingBanDuration: 180000, // 3 minutes
+
+    accountFreezeChance: 0.02, // 2% chance randomly
+    accountFreezeDuration: 300000 // 5 minutes
+};
+
+// Margin Trading Configuration
+const MARGIN_CONFIG = {
+    leverageOptions: [1, 2, 5, 10],
+    interestRate: 0.001, // 0.1% per update
+    marginCallThreshold: 0.30, // Margin call at 30% equity
+    liquidationThreshold: 0.20, // Auto-liquidate at 20% equity
+    minEquity: 10000 // Need $10k to enable margin
+};
+
+// ========================================
+// TRADING MECHANICS - NEW ASSET CLASSES
+// ========================================
+
+// Options Trading
+const OPTIONS_CONFIG = {
+    enabled: false,
+    minEquity: 25000, // Need $25k to trade options
+    expirationDates: [7, 14, 30, 60, 90], // Days until expiration
+    strikeIntervals: [0.9, 0.95, 1.0, 1.05, 1.1], // Strike prices relative to current price
+    premiumMultiplier: 0.05, // Base premium as % of stock price
+    greeks: {
+        delta: true,
+        gamma: true,
+        theta: true,
+        vega: true
+    }
+};
+
+// Short Selling
+const SHORT_SELLING_CONFIG = {
+    enabled: false,
+    minEquity: 15000,
+    borrowFeeRate: 0.002, // 0.2% per update
+    marginRequirement: 1.5, // 150% margin
+    locateFeePer1000: 5 // $5 per 1000 shares to locate
+};
+
+// Crypto Trading
+const CRYPTO_ASSETS = [
+    { symbol: 'BTC', name: 'Bitcoin', basePrice: 45000, volatility: 'extreme', sector: 'Cryptocurrency' },
+    { symbol: 'ETH', name: 'Ethereum', basePrice: 2500, volatility: 'extreme', sector: 'Cryptocurrency' },
+    { symbol: 'BNB', name: 'Binance Coin', basePrice: 350, volatility: 'extreme', sector: 'Cryptocurrency' },
+    { symbol: 'SOL', name: 'Solana', basePrice: 100, volatility: 'extreme', sector: 'Cryptocurrency' },
+    { symbol: 'ADA', name: 'Cardano', basePrice: 0.50, volatility: 'extreme', sector: 'Cryptocurrency' },
+    { symbol: 'DOGE', name: 'Dogecoin', basePrice: 0.08, volatility: 'extreme', sector: 'Cryptocurrency' }
+];
+
+// Forex Trading
+const FOREX_PAIRS = [
+    { symbol: 'EUR/USD', name: 'Euro/US Dollar', basePrice: 1.08, pipValue: 0.0001, volatility: 'low' },
+    { symbol: 'GBP/USD', name: 'British Pound/US Dollar', basePrice: 1.27, pipValue: 0.0001, volatility: 'moderate' },
+    { symbol: 'USD/JPY', name: 'US Dollar/Japanese Yen', basePrice: 149.50, pipValue: 0.01, volatility: 'low' },
+    { symbol: 'USD/CHF', name: 'US Dollar/Swiss Franc', basePrice: 0.88, pipValue: 0.0001, volatility: 'low' },
+    { symbol: 'AUD/USD', name: 'Australian Dollar/US Dollar', basePrice: 0.66, pipValue: 0.0001, volatility: 'moderate' }
+];
+
+// Commodities
+const COMMODITIES = [
+    { symbol: 'GOLD', name: 'Gold Futures', basePrice: 2050, volatility: 'moderate', sector: 'Commodities', unit: 'oz' },
+    { symbol: 'SILVER', name: 'Silver Futures', basePrice: 24, volatility: 'high', sector: 'Commodities', unit: 'oz' },
+    { symbol: 'OIL', name: 'Crude Oil', basePrice: 78, volatility: 'high', sector: 'Commodities', unit: 'barrel' },
+    { symbol: 'NATGAS', name: 'Natural Gas', basePrice: 2.8, volatility: 'extreme', sector: 'Commodities', unit: 'MMBtu' },
+    { symbol: 'WHEAT', name: 'Wheat Futures', basePrice: 6.5, volatility: 'moderate', sector: 'Commodities', unit: 'bushel' },
+    { symbol: 'CORN', name: 'Corn Futures', basePrice: 4.8, volatility: 'moderate', sector: 'Commodities', unit: 'bushel' }
+];
+
+// Bonds
+const BONDS = [
+    { symbol: 'US10Y', name: 'US 10-Year Treasury', basePrice: 100, yield: 0.045, volatility: 'low', sector: 'Bonds' },
+    { symbol: 'US30Y', name: 'US 30-Year Treasury', basePrice: 100, yield: 0.048, volatility: 'low', sector: 'Bonds' },
+    { symbol: 'CORP-AAA', name: 'AAA Corporate Bond', basePrice: 100, yield: 0.055, volatility: 'low', sector: 'Bonds' },
+    { symbol: 'CORP-BB', name: 'BB Corporate Bond', basePrice: 100, yield: 0.085, volatility: 'moderate', sector: 'Bonds' },
+    { symbol: 'MUNI', name: 'Municipal Bond', basePrice: 100, yield: 0.04, volatility: 'low', sector: 'Bonds' }
+];
+
+// ========================================
+// WORLD EVENTS & REALISM
+// ========================================
+
+// Earnings Seasons
+const EARNINGS_CONFIG = {
+    frequency: 0.02, // 2% chance per update
+    beatExpectations: 0.55, // 55% chance to beat
+    missExpectations: 0.30, // 30% chance to miss
+    meetExpectations: 0.15, // 15% chance to meet
+    beatImpact: { min: 0.05, max: 0.15 }, // 5-15% price increase
+    missImpact: { min: -0.15, max: -0.05 }, // 5-15% price decrease
+    meetImpact: { min: -0.02, max: 0.02 } // ±2% price change
+};
+
+// Dividend System
+const DIVIDEND_CONFIG = {
+    frequency: 0.01, // 1% chance per update
+    yieldRange: { min: 0.01, max: 0.05 }, // 1-5% annual yield
+    paymentFrequency: 'quarterly',
+    exDividendDays: 2, // Days before payment
+    specialDividendChance: 0.1, // 10% chance of special dividend
+    specialDividendMultiplier: 3 // 3x normal dividend
+};
+
+// Stock Splits
+const STOCK_SPLIT_CONFIG = {
+    frequency: 0.005, // 0.5% chance per update
+    priceThreshold: 500, // Stocks above $500 more likely to split
+    splitRatios: [
+        { ratio: 2, weight: 0.5 }, // 2:1 split (50% chance)
+        { ratio: 3, weight: 0.3 }, // 3:1 split (30% chance)
+        { ratio: 5, weight: 0.15 }, // 5:1 split (15% chance)
+        { ratio: 10, weight: 0.05 } // 10:1 split (5% chance)
+    ],
+    reverseSplitThreshold: 5, // Stocks below $5 may reverse split
+    reverseSplitRatios: [
+        { ratio: 0.1, weight: 0.6 }, // 1:10 reverse split
+        { ratio: 0.2, weight: 0.4 } // 1:5 reverse split
+    ]
+};
+
+// Mergers & Acquisitions
+const MA_CONFIG = {
+    frequency: 0.003, // 0.3% chance per update
+    premiumRange: { min: 0.20, max: 0.50 }, // 20-50% premium over current price
+    dealTypes: ['cash', 'stock', 'mixed'],
+    approvalTime: 30000, // 30 seconds to approve deal
+    failureChance: 0.25 // 25% chance deal falls through
+};
+
+// Bankruptcy & Delisting
+const BANKRUPTCY_CONFIG = {
+    frequency: 0.001, // 0.1% chance per update
+    warningThreshold: 10, // Stocks below $10 get warnings
+    warningDuration: 60000, // 1 minute warning
+    delistingPrice: 1, // Delisted if below $1
+    recoveryChance: 0.05 // 5% chance to recover from bankruptcy
+};
+
+// Regulatory Events
+const REGULATORY_CONFIG = {
+    frequency: 0.008, // 0.8% chance per update
+    types: [
+        { type: 'SEC Investigation', impact: { min: -0.20, max: -0.10 }, duration: 120000 },
+        { type: 'Antitrust Lawsuit', impact: { min: -0.25, max: -0.15 }, duration: 180000 },
+        { type: 'FDA Approval', impact: { min: 0.15, max: 0.30 }, duration: 60000 },
+        { type: 'Patent Granted', impact: { min: 0.10, max: 0.20 }, duration: 90000 },
+        { type: 'Environmental Fine', impact: { min: -0.15, max: -0.05 }, duration: 60000 }
+    ]
+};
+
+// Global Markets
+const GLOBAL_MARKETS = [
+    { name: 'NYSE', timezone: 'America/New_York', open: 9.5, close: 16, symbol: '🇺🇸' },
+    { name: 'NASDAQ', timezone: 'America/New_York', open: 9.5, close: 16, symbol: '🇺🇸' },
+    { name: 'LSE', timezone: 'Europe/London', open: 8, close: 16.5, symbol: '🇬🇧' },
+    { name: 'TSE', timezone: 'Asia/Tokyo', open: 9, close: 15, symbol: '🇯🇵' },
+    { name: 'SSE', timezone: 'Asia/Shanghai', open: 9.5, close: 15, symbol: '🇨🇳' }
+];
+
+// After-Hours Trading
+const AFTER_HOURS_CONFIG = {
+    enabled: false,
+    minEquity: 50000,
+    preMarketStart: 4, // 4 AM
+    preMarketEnd: 9.5, // 9:30 AM
+    afterHoursStart: 16, // 4 PM
+    afterHoursEnd: 20, // 8 PM
+    volatilityMultiplier: 1.5, // 50% more volatile
+    liquidityMultiplier: 0.5 // 50% less liquid (wider spreads)
 };
 

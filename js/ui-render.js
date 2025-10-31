@@ -1,5 +1,105 @@
 // UI Rendering Functions
 
+// Render status bar for special effects
+function renderStatusBar() {
+    const statusBar = document.getElementById('statusBar');
+    if (!statusBar) return;
+
+    const statuses = [];
+
+    // Check for trading halt
+    if (gameState.tradingHalted) {
+        const timeLeft = Math.max(0, gameState.haltEndTime - Date.now());
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        statuses.push({ icon: '🚫', text: `MARKET HALT - ${minutes}:${seconds.toString().padStart(2, '0')}`, type: 'bad' });
+    }
+
+    // Check for broker outage
+    if (gameState.brokerOutage) {
+        const timeLeft = Math.max(0, gameState.outageEndTime - Date.now());
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        statuses.push({ icon: '⚠️', text: `BROKER OUTAGE - ${minutes}:${seconds.toString().padStart(2, '0')}`, type: 'bad' });
+    }
+
+    // Check for loss protection
+    if (gameState.protectedTrades > 0) {
+        statuses.push({ icon: '🛡️', text: `Loss Protection: ${gameState.protectedTrades} trades`, type: 'good' });
+    }
+
+    // Check for diamond hands
+    if (gameState.diamondHandsActive) {
+        const timeLeft = Math.max(0, gameState.diamondHandsEndTime - Date.now());
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        statuses.push({ icon: '💎', text: `DIAMOND HANDS - ${minutes}:${seconds.toString().padStart(2, '0')}`, type: 'good' });
+    }
+
+    // Check for insider tips
+    if (gameState.activeInsiderTip && gameState.insiderTipEndTime) {
+        const timeLeft = Math.max(0, gameState.insiderTipEndTime - Date.now());
+        const seconds = Math.floor(timeLeft / 1000);
+        const direction = gameState.activeInsiderTip.willRise ? '📈 RISE' : '📉 FALL';
+        statuses.push({
+            icon: '🕵️',
+            text: `INSIDER TIP: ${gameState.activeInsiderTip.symbol} will ${direction} (${seconds}s)`,
+            type: 'good'
+        });
+    }
+
+    // Check for market cycles
+    const marketCycle = gameState.currentMarketCycle || 'neutral';
+    if (marketCycle !== 'neutral' && MARKET_CYCLES[marketCycle]) {
+        const cycle = MARKET_CYCLES[marketCycle];
+        const timeLeft = Math.max(0, gameState.marketCycleEndTime - Date.now());
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        const cycleType = (marketCycle === 'bull' || marketCycle === 'recovery') ? 'good' : 'bad';
+        statuses.push({
+            icon: cycle.icon,
+            text: `${cycle.name.toUpperCase()} - ${minutes}:${seconds.toString().padStart(2, '0')}`,
+            type: cycleType
+        });
+    }
+
+    // Check for active combos
+    if (isComboActive && isComboActive('goldenHour')) {
+        statuses.push({ icon: '✨', text: 'GOLDEN HOUR COMBO!', type: 'good' });
+    }
+    if (isComboActive && isComboActive('perfectStorm')) {
+        statuses.push({ icon: '⚡', text: 'PERFECT STORM COMBO!', type: 'good' });
+    }
+    if (isComboActive && isComboActive('safeHaven')) {
+        statuses.push({ icon: '🛡️', text: 'SAFE HAVEN COMBO!', type: 'good' });
+    }
+    if (isComboActive && isComboActive('marketMaster')) {
+        statuses.push({ icon: '👑', text: 'MARKET MASTER COMBO!', type: 'good' });
+    }
+
+    if (statuses.length === 0) {
+        statusBar.style.display = 'none';
+        return;
+    }
+
+    statusBar.style.display = 'flex';
+    const hasGood = statuses.some(s => s.type === 'good');
+    const hasBad = statuses.some(s => s.type === 'bad');
+
+    if (hasGood && !hasBad) {
+        statusBar.className = 'status-bar positive';
+    } else {
+        statusBar.className = 'status-bar';
+    }
+
+    statusBar.innerHTML = statuses.map(s => `
+        <div class="status-item">
+            <span class="status-icon">${s.icon}</span>
+            <span>${s.text}</span>
+        </div>
+    `).join('');
+}
+
 // Render stats
 function renderStats() {
     const wealthZone = calculateWealthZoneScore();
@@ -203,8 +303,18 @@ function renderEquityNode(node, isFocused = false) {
         'extreme': '#ff0044'
     };
 
+    // Check for news impact
+    let newsBadge = '';
+    if (node.newsImpact) {
+        const sentiment = node.newsImpact.sentiment;
+        const emoji = sentiment === 'positive' ? '📈' : (sentiment === 'negative' ? '📉' : '📰');
+        const color = sentiment === 'positive' ? '#00ff88' : (sentiment === 'negative' ? '#ff4444' : '#00f0ff');
+        newsBadge = `<div style="position: absolute; top: 10px; right: 10px; background: ${color}; color: #000; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold;">${emoji} NEWS</div>`;
+    }
+
     return `
-        <div class="node-card" id="node-${node.symbol}">
+        <div class="node-card" id="node-${node.symbol}" style="position: relative;">
+            ${newsBadge}
             <div class="node-header">
                 <div>
                     <div class="node-symbol">${node.symbol}</div>
@@ -251,15 +361,99 @@ function renderEquityNode(node, isFocused = false) {
 
 // Render trading (all nodes)
 function renderTrading() {
-    const grid = document.getElementById('tradingGrid');
-    if (!grid) return;
+    // Use the new asset type system
+    if (typeof showAssetType === 'function') {
+        const assetType = typeof currentAssetType !== 'undefined' ? currentAssetType : 'stocks';
+        showAssetType(assetType);
+    } else {
+        // Fallback to old system
+        const grid = document.getElementById('tradingGrid');
+        if (!grid) return;
 
-    grid.innerHTML = EQUITY_NODES.map(node => renderEquityNode(node, false)).join('');
+        const sortBy = gameState.stockSortBy || 'symbol';
+        const sortOrder = gameState.stockSortOrder || 'asc';
+        const searchQuery = gameState.stockSearchQuery || '';
 
-    // Draw charts after DOM update
-    setTimeout(() => {
-        EQUITY_NODES.forEach(node => drawMiniChart(node.symbol));
-    }, 10);
+        let stocks = EQUITY_NODES;
+        if (typeof filterStocks === 'function') {
+            stocks = filterStocks(stocks, searchQuery);
+        }
+        if (typeof sortStocks === 'function') {
+            stocks = sortStocks(stocks, sortBy, sortOrder);
+        }
+
+        grid.innerHTML = stocks.map(node => renderEquityNode(node, false)).join('');
+
+        setTimeout(() => {
+            stocks.forEach(node => drawMiniChart(node.symbol));
+        }, 10);
+    }
+
+    // Update margin display
+    updateMarginDisplay();
+
+    // Update sort controls
+    updateSortControls();
+
+    // Update advanced trading displays
+    if (typeof updateShortPositionsDisplay === 'function') updateShortPositionsDisplay();
+    if (typeof updateOptionsDisplay === 'function') updateOptionsDisplay();
+}
+
+// Update margin display
+function updateMarginDisplay() {
+    const debtDisplay = document.getElementById('marginDebtDisplay');
+    const leverageSelect = document.getElementById('leverageSelect');
+
+    if (debtDisplay) {
+        const debt = gameState.marginDebt || 0;
+        debtDisplay.textContent = `Debt: ${formatCurrency(debt)}`;
+        debtDisplay.style.color = debt > 0 ? '#ff4444' : '#00ff88';
+    }
+
+    if (leverageSelect && gameState.marginEnabled) {
+        leverageSelect.value = gameState.currentLeverage || 1;
+        leverageSelect.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+    }
+}
+
+// Update sort controls
+function updateSortControls() {
+    const sortBySelect = document.getElementById('stockSortBy');
+    const sortOrderBtn = document.getElementById('stockSortOrder');
+
+    if (sortBySelect) {
+        sortBySelect.value = gameState.stockSortBy || 'symbol';
+    }
+
+    if (sortOrderBtn) {
+        const order = gameState.stockSortOrder || 'asc';
+        sortOrderBtn.textContent = order === 'asc' ? '⬆️ Ascending' : '⬇️ Descending';
+    }
+}
+
+// Handle stock search
+function handleStockSearch(query) {
+    gameState.stockSearchQuery = query;
+    saveState();
+    renderTrading();
+}
+
+// Handle stock sort
+function handleStockSort() {
+    const sortBySelect = document.getElementById('stockSortBy');
+    if (sortBySelect) {
+        gameState.stockSortBy = sortBySelect.value;
+        saveState();
+        renderTrading();
+    }
+}
+
+// Toggle sort order
+function toggleSortOrder() {
+    gameState.stockSortOrder = (gameState.stockSortOrder === 'asc') ? 'desc' : 'asc';
+    saveState();
+    renderTrading();
 }
 
 // Removed renderFocusStream - feature removed
@@ -394,9 +588,144 @@ function renderProgression() {
     renderMilestones();
 }
 
+// Render difficulty selector
+function renderDifficultySelector() {
+    const container = document.getElementById('difficultySelector');
+    if (!container) return;
+
+    const currentMode = gameState.difficultyMode || 'easy';
+
+    container.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+            ${Object.entries(DIFFICULTY_MODES).map(([key, mode]) => `
+                <div style="background: rgba(0, 0, 0, 0.3); border: 2px solid ${currentMode === key ? '#00ff88' : 'rgba(255, 255, 255, 0.1)'}; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s;" onclick="changeDifficulty('${key}')">
+                    <div style="text-align: center; font-size: 48px; margin-bottom: 10px;">${mode.icon}</div>
+                    <div style="color: #fff; font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 10px;">
+                        ${mode.name} ${currentMode === key ? '✓' : ''}
+                    </div>
+                    <div style="color: #888; font-size: 13px; text-align: center; margin-bottom: 15px;">
+                        ${mode.description}
+                    </div>
+                    <div style="color: #00f0ff; font-size: 14px; margin-bottom: 5px;">
+                        💰 Start: ${formatCurrency(mode.startingCapital)}
+                    </div>
+                    <div style="color: #ff8800; font-size: 14px; margin-bottom: 5px;">
+                        📊 Volatility: ${(mode.volatilityMultiplier * 100).toFixed(0)}%
+                    </div>
+                    <div style="color: #ff4444; font-size: 14px; margin-bottom: 5px;">
+                        ⚠️ Bad Events: ${(mode.badEventMultiplier * 100).toFixed(0)}%
+                    </div>
+                    <div style="color: #ffd700; font-size: 14px;">
+                        💸 Tax: ${TAX_RATES[mode.taxRate].rate * 100}%
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Change difficulty mode
+function changeDifficulty(newMode) {
+    if (gameState.difficultyMode === newMode) {
+        showNotification('Already on this difficulty!');
+        return;
+    }
+
+    const mode = DIFFICULTY_MODES[newMode];
+    const confirmMsg = `Change to ${mode.name}?\n\n` +
+        `This will reset your game progress!\n` +
+        `(Prestige data will be kept)\n\n` +
+        `New Settings:\n` +
+        `💰 Starting Capital: ${formatCurrency(mode.startingCapital)}\n` +
+        `📊 Volatility: ${(mode.volatilityMultiplier * 100).toFixed(0)}%\n` +
+        `⚠️ Bad Events: ${(mode.badEventMultiplier * 100).toFixed(0)}%\n` +
+        `💸 Tax Rate: ${TAX_RATES[mode.taxRate].rate * 100}%`;
+
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    // Save prestige data
+    const prestigeData = {
+        prestigeLevel: gameState.prestigeLevel || 0,
+        prestigePoints: gameState.prestigePoints || 0,
+        totalLifetimeEarnings: gameState.totalLifetimeEarnings || 0,
+        unlockedExclusiveStocks: [...(gameState.unlockedExclusiveStocks || [])],
+        prestigeBadges: [...(gameState.prestigeBadges || [])],
+        prestigeTitles: [...(gameState.prestigeTitles || [])],
+        redeemedCodes: [...(gameState.redeemedCodes || [])],
+        cheatMenuUnlocked: gameState.cheatMenuUnlocked,
+        unlockedStocks: [...(gameState.unlockedStocks || [])]
+    };
+
+    // Reset game state (without page reload)
+    gameState.digitalReserve = mode.startingCapital;
+    gameState.activeStrategies = [];
+    gameState.completedCycles = [];
+    gameState.focusStream = [];
+    gameState.milestones = [];
+    gameState.currentTier = 0;
+    gameState.tradedSectors = new Set();
+    gameState.currentRank = 0;
+    gameState.rankPoints = 0;
+    gameState.stopLossOrders = [];
+    gameState.takeProfitOrders = [];
+    gameState.limitBuyOrders = [];
+    gameState.limitSellOrders = [];
+    gameState.wealthHistory = [];
+    gameState.totalWins = 0;
+    gameState.totalLosses = 0;
+    gameState.bestTrade = null;
+    gameState.worstTrade = null;
+    gameState.totalHoldTime = 0;
+    gameState.profitBySector = {};
+    gameState.achievementPoints = 0;
+    gameState.secretAchievements = [];
+    gameState.newsEvents = [];
+    gameState.currentNews = null;
+    gameState.potions = {
+        speedBoost: 0,
+        profitMultiplier: 0,
+        luckBoost: 0,
+        dividendBoost: 0,
+        insiderVision: 0,
+        lossProtection: 0,
+        timeFreeze: 0,
+        volatilityBomb: 0,
+        diamondHands: 0,
+        marketCrash: 0,
+        bullRun: 0
+    };
+    gameState.activePotions = [];
+    gameState.totalTaxesPaid = 0;
+    gameState.difficultyMode = newMode;
+
+    // Restore prestige data
+    Object.assign(gameState, prestigeData);
+
+    // Reset stock prices
+    EQUITY_NODES.forEach(node => {
+        node.currentPrice = node.basePrice;
+        node.previousPrice = node.basePrice;
+        node.priceHistory = [node.basePrice];
+        node.volumeHistory = [];
+        node.bankrupt = false;
+    });
+
+    // Reset milestones
+    MILESTONES.forEach(m => m.unlocked = false);
+    SECRET_ACHIEVEMENTS.forEach(a => a.unlocked = false);
+
+    showNotification(`✅ Difficulty changed to ${mode.name}!`);
+    saveState();
+    renderAll();
+    renderDifficultySelector();
+}
+
 // Render all
 function renderAll() {
     renderStats();
+    renderStatusBar(); // Render special effects status
     renderNewsTicker();
     renderTrading();
     renderActiveStrategies();
@@ -408,6 +737,15 @@ function renderAll() {
     renderDailyChallenge();
     renderMarketEvent();
     renderActiveOrders();
+    renderDifficultySelector();
+
+    // Render prestige if on that tab
+    const prestigeTab = document.getElementById('prestige');
+    if (prestigeTab && prestigeTab.classList.contains('active')) {
+        if (typeof renderPrestigeDisplay === 'function') {
+            renderPrestigeDisplay();
+        }
+    }
 
     // Render analytics if on that tab
     const analyticsTab = document.getElementById('analytics');
@@ -463,12 +801,26 @@ function switchTab(tabName) {
     } else if (tabName === 'portfolio') {
         renderPortfolio();
         renderOrders();
+    } else if (tabName === 'prestige') {
+        if (typeof renderPrestigeDisplay === 'function') {
+            renderPrestigeDisplay();
+        }
     }
 }
 
 // Modal functions
 function openAcquireModal(symbol) {
-    const node = EQUITY_NODES.find(n => n.symbol === symbol);
+    // Find asset in any asset class
+    let node = EQUITY_NODES.find(n => n.symbol === symbol);
+    if (!node && typeof getAssetBySymbol === 'function') {
+        node = getAssetBySymbol(symbol);
+    }
+
+    if (!node) {
+        alert('Asset not found!');
+        return;
+    }
+
     document.getElementById('modalSymbol').textContent = node.symbol;
     document.getElementById('modalName').textContent = node.name;
     document.getElementById('modalPrice').textContent = formatCurrency(node.currentPrice);
@@ -483,7 +835,15 @@ function closeModal() {
 
 function updateTotalCost() {
     const symbol = document.getElementById('modalSymbol').textContent;
-    const node = EQUITY_NODES.find(n => n.symbol === symbol);
+
+    // Find asset in any asset class
+    let node = EQUITY_NODES.find(n => n.symbol === symbol);
+    if (!node && typeof getAssetBySymbol === 'function') {
+        node = getAssetBySymbol(symbol);
+    }
+
+    if (!node) return;
+
     const quantity = parseInt(document.getElementById('quantityInput').value) || 0;
     const totalCost = quantity * node.currentPrice;
     document.getElementById('totalCost').textContent = formatCurrency(totalCost);

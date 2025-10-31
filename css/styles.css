@@ -27,6 +27,35 @@ body {
     padding: 20px;
 }
 
+/* Details/Summary Styling */
+details {
+    transition: all 0.3s ease;
+}
+
+details summary {
+    list-style: none;
+    transition: all 0.2s ease;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+}
+
+details[open] summary::before {
+    transform: rotate(90deg);
+}
+
+details summary:hover {
+    background: rgba(0, 240, 255, 0.1) !important;
+}
+
 /* News Ticker */
 .news-ticker {
     background: linear-gradient(90deg, rgba(0, 240, 255, 0.1), rgba(176, 0, 255, 0.1));
@@ -81,6 +110,42 @@ body {
 @keyframes ticker-scroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
+}
+
+/* Status Bar for Special Effects */
+.status-bar {
+    background: linear-gradient(90deg, rgba(255, 68, 68, 0.15), rgba(255, 165, 0, 0.15));
+    border: 2px solid rgba(255, 68, 68, 0.5);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+.status-bar.positive {
+    background: linear-gradient(90deg, rgba(0, 255, 136, 0.15), rgba(0, 240, 255, 0.15));
+    border-color: rgba(0, 255, 136, 0.5);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.status-icon {
+    font-size: 20px;
+}
+
+@keyframes pulse-border {
+    0%, 100% { border-color: rgba(255, 68, 68, 0.5); }
+    50% { border-color: rgba(255, 68, 68, 0.9); }
 }
 
 /* Compact View */

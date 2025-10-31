@@ -30,7 +30,13 @@ function updatePrices() {
         if (node.volatility === 'extreme') baseVolatility = 0.12;  // 12% - can swing ±12%
 
         // Add random volatility spike (10% chance for extra volatility)
-        const volatilitySpike = Math.random() < 0.1 ? 1.5 : 1.0;
+        let volatilitySpike = Math.random() < 0.1 ? 1.5 : 1.0;
+
+        // Apply volatility bomb potion - extreme price swings
+        if (isPotionActive('volatility')) {
+            volatilitySpike *= 3.0; // 3x volatility
+        }
+
         const volatility = baseVolatility * volatilitySpike;
 
         // Get pulse direction (bullish = up, bearish = down)
@@ -40,16 +46,51 @@ function updatePrices() {
         if (node.pulse === 'volatile') direction = (Math.random() - 0.5) * 3; // More extreme swings
         if (node.pulse === 'neutral') direction = 0;
 
+        // Apply market cycle effects
+        const marketCycle = gameState.currentMarketCycle || 'neutral';
+        if (marketCycle === 'bull') {
+            direction += 0.6; // Strong upward bias
+        } else if (marketCycle === 'bear') {
+            direction -= 0.6; // Strong downward bias
+        } else if (marketCycle === 'recovery') {
+            direction += 0.3; // Moderate upward bias
+        }
+
         // Apply luck boost potion - make prices go up more
         if (isPotionActive('luck')) {
             direction += 0.5;
+        }
+
+        // Apply bull run potion - all stocks rise
+        if (isPotionActive('bull')) {
+            direction += 0.8; // Strong upward bias
+        }
+
+        // Apply golden hour combo (speed + luck)
+        if (isComboActive && isComboActive('goldenHour')) {
+            direction += 0.3; // Extra luck boost
+        }
+
+        // Apply perfect storm combo (volatility + profit)
+        if (isComboActive && isComboActive('perfectStorm')) {
+            volatilitySpike *= 1.5; // Even more volatility
         }
 
         // Calculate price change with more randomness
         const randomChange = (Math.random() - 0.5) * 2.5; // -1.25 to 1.25 (more random)
 
         // Weight randomness more heavily for unpredictability
-        const finalChange = (randomChange * 0.7 + direction * 0.3) * volatility;
+        let finalChange = (randomChange * 0.7 + direction * 0.3) * volatility;
+
+        // Apply sector correlation
+        if (typeof applySectorCorrelation === 'function') {
+            finalChange = applySectorCorrelation(node, finalChange);
+        }
+
+        // Apply economic indicators impact
+        if (typeof applyEconomicImpact === 'function') {
+            finalChange = applyEconomicImpact(node, finalChange);
+        }
 
         // Update price (minimum $1)
         node.currentPrice = Math.max(1, node.currentPrice * (1 + finalChange));
@@ -80,10 +121,16 @@ function updatePrices() {
         node.close = node.currentPrice;
     });
 
-    // Update portfolio values
+    // Update portfolio values for all asset types
     if (gameState.activeStrategies) {
         gameState.activeStrategies.forEach(strategy => {
-            const node = EQUITY_NODES.find(n => n.symbol === strategy.symbol);
+            let node = EQUITY_NODES.find(n => n.symbol === strategy.symbol);
+
+            // If not a stock, check other asset types
+            if (!node && typeof getAssetBySymbol === 'function') {
+                node = getAssetBySymbol(strategy.symbol);
+            }
+
             if (node) {
                 strategy.currentPrice = node.currentPrice;
                 strategy.currentValue = strategy.quantity * node.currentPrice;
@@ -109,7 +156,13 @@ function updateActiveStrategies() {
     if (!gameState.activeStrategies) return;
 
     gameState.activeStrategies.forEach(strategy => {
-        const node = EQUITY_NODES.find(n => n.symbol === strategy.symbol);
+        let node = EQUITY_NODES.find(n => n.symbol === strategy.symbol);
+
+        // If not a stock, check other asset types
+        if (!node && typeof getAssetBySymbol === 'function') {
+            node = getAssetBySymbol(strategy.symbol);
+        }
+
         if (node) {
             strategy.currentPrice = node.currentPrice;
             strategy.currentValue = strategy.quantity * node.currentPrice;
@@ -121,7 +174,13 @@ function updateActiveStrategies() {
 
 // Helper: Calculate performance metric for a strategy
 function calculatePerformanceMetric(strategy) {
-    const node = EQUITY_NODES.find(n => n.symbol === strategy.symbol);
+    let node = EQUITY_NODES.find(n => n.symbol === strategy.symbol);
+
+    // If not a stock, check other asset types
+    if (!node && typeof getAssetBySymbol === 'function') {
+        node = getAssetBySymbol(strategy.symbol);
+    }
+
     if (!node) return 0;
 
     const currentValue = strategy.quantity * node.currentPrice;

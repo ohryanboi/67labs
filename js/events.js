@@ -116,6 +116,123 @@ function triggerRandomMarketEvent() {
     saveState();
 }
 
+// Market Cycle System
+function updateMarketCycle() {
+    const now = Date.now();
+
+    // Check if current cycle should end
+    if (gameState.marketCycleEndTime && now >= gameState.marketCycleEndTime) {
+        const oldCycle = gameState.currentMarketCycle;
+        gameState.currentMarketCycle = 'neutral';
+        gameState.marketCycleEndTime = null;
+
+        if (oldCycle !== 'neutral') {
+            showNotification(`📊 ${MARKET_CYCLES[oldCycle].name} ended - Market returning to normal`);
+        }
+
+        saveState();
+    }
+
+    // Don't trigger new cycle if one is active
+    if (gameState.currentMarketCycle !== 'neutral') return;
+
+    // Check for recession trigger (less likely if recent recession)
+    const timeSinceRecession = gameState.lastRecessionTime ? now - gameState.lastRecessionTime : Infinity;
+    const recessionCooldown = 600000; // 10 minutes
+
+    // Try to trigger a new cycle
+    Object.keys(MARKET_CYCLES).forEach(cycleKey => {
+        if (cycleKey === 'neutral') return;
+
+        const cycle = MARKET_CYCLES[cycleKey];
+        let probability = cycle.probability;
+
+        // Adjust probabilities based on difficulty
+        const difficulty = DIFFICULTY_MODES[gameState.difficultyMode || 'easy'];
+        if (cycleKey === 'recession' || cycleKey === 'bear') {
+            probability *= difficulty.volatilityMultiplier;
+        }
+
+        // Reduce recession chance if recent recession
+        if (cycleKey === 'recession' && timeSinceRecession < recessionCooldown) {
+            probability *= 0.1; // 90% reduction
+        }
+
+        // Increase recovery chance after recession
+        if (cycleKey === 'recovery' && timeSinceRecession < recessionCooldown) {
+            probability *= 3.0; // 3x more likely
+        }
+
+        if (Math.random() < probability) {
+            gameState.currentMarketCycle = cycleKey;
+            gameState.marketCycleEndTime = now + cycle.duration;
+
+            if (cycleKey === 'recession') {
+                gameState.lastRecessionTime = now;
+                // Apply immediate price drop
+                EQUITY_NODES.forEach(node => {
+                    const drop = 0.30 + Math.random() * 0.20; // 30-50% drop
+                    node.currentPrice *= (1 - drop);
+                });
+                showNotification(`💔 RECESSION! All stocks crashed ${Math.floor((0.30 + 0.20/2) * 100)}%!`);
+            } else {
+                showNotification(`${cycle.icon} ${cycle.name} started! ${cycle.description}`);
+            }
+
+            playSound('achievement');
+            saveState();
+        }
+    });
+}
+
+// Bad Random Events System
+function triggerBadEvent() {
+    // Check if trading is halted or broker outage is active
+    if (gameState.tradingHalted && Date.now() >= gameState.haltEndTime) {
+        gameState.tradingHalted = false;
+        gameState.haltEndTime = null;
+        showNotification('✅ Market halt lifted! Trading resumed.');
+        saveState();
+    }
+
+    if (gameState.brokerOutage && Date.now() >= gameState.outageEndTime) {
+        gameState.brokerOutage = false;
+        gameState.outageEndTime = null;
+        showNotification('✅ Broker systems restored! Trading resumed.');
+        saveState();
+    }
+
+    // Don't trigger new bad events if one is already active
+    if (gameState.tradingHalted || gameState.brokerOutage) return;
+
+    // Get difficulty multiplier
+    const difficulty = DIFFICULTY_MODES[gameState.difficultyMode || 'easy'];
+    const eventMultiplier = difficulty.badEventMultiplier || 1.0;
+
+    // Check each bad event
+    BAD_EVENTS.forEach(event => {
+        const adjustedProbability = event.probability * eventMultiplier;
+        if (Math.random() < adjustedProbability) {
+            const message = event.execute(gameState);
+            showNotification(message);
+            playSound('achievement');
+            saveState();
+            renderAll();
+        }
+    });
+
+    // Check for stock bankruptcy (nightmare mode only)
+    if (difficulty.bankruptcyChance && Math.random() < difficulty.bankruptcyChance) {
+        const node = EQUITY_NODES[Math.floor(Math.random() * EQUITY_NODES.length)];
+        node.currentPrice = 1; // Stock goes to $1
+        node.bankrupt = true;
+        showNotification(`💀 BANKRUPTCY! ${node.symbol} has gone bankrupt!`);
+        playSound('achievement');
+        saveState();
+        renderAll();
+    }
+}
+
 // Stock splits
 function triggerStockSplit() {
     // 0.1% chance per update cycle

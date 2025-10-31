@@ -305,3 +305,15 @@ function closeUpdateLog() {
     }
 }
 
+// Toggle All Ranks Display
+function toggleAllRanksDisplay() {
+    const container = document.getElementById('allRanksContainer');
+    if (container) {
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+}
+

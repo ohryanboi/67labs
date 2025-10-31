@@ -67,11 +67,109 @@ let gameState = {
         speedBoost: 0,
         profitMultiplier: 0,
         luckBoost: 0,
-        dividendBoost: 0
+        dividendBoost: 0,
+        insiderVision: 0,
+        lossProtection: 0,
+        timeFreeze: 0,
+        volatilityBomb: 0,
+        diamondHands: 0,
+        marketCrash: 0,
+        bullRun: 0
     },
     activePotions: [],
     redeemedCodes: [],
-    cheatMenuUnlocked: false
+    cheatMenuUnlocked: false,
+
+    // Bad Events
+    tradingHalted: false,
+    haltEndTime: null,
+    brokerOutage: false,
+    outageEndTime: null,
+    protectedTrades: 0, // For loss protection potion
+    diamondHandsActive: false,
+    diamondHandsEndTime: null,
+    futurePrice: null, // For insider vision
+
+    // Market Cycles
+    currentMarketCycle: 'neutral',
+    marketCycleEndTime: null,
+    lastRecessionTime: null,
+
+    // Tax System
+    totalTaxesPaid: 0,
+    taxableGains: 0,
+
+    // Difficulty & Prestige
+    difficultyMode: 'easy', // easy, normal, hard, nightmare
+    prestigeLevel: 0,
+    prestigePoints: 0,
+    totalLifetimeEarnings: 0,
+    unlockedExclusiveStocks: [],
+    prestigeBadges: [],
+    prestigeTitles: [],
+
+    // Stock unlocking system
+    unlockedStocks: ['TECH-A', 'FIN-A', 'HLTH-A', 'ENRG-A', 'CONS-A', 'IND-A', 'RET-A', 'TECH-B', 'FIN-B', 'HLTH-B'],
+    totalTrades: 0,
+
+    // Economic indicators
+    economicIndicators: {
+        interestRate: 0.05,
+        inflation: 0.03,
+        gdpGrowth: 0.03,
+        unemployment: 0.04
+    },
+
+    // Insider trading
+    activeInsiderTip: null,
+    insiderTipEndTime: null,
+    insiderPenalties: 0,
+
+    // IPOs
+    activeIPOs: [],
+    ipoHistory: [],
+
+    // Stock sorting and filtering
+    stockSortBy: 'symbol', // symbol, price, change, sector
+    stockSortOrder: 'asc', // asc, desc
+    stockSearchQuery: '',
+
+    // Achievement chains
+    achievementChains: {},
+
+    // Bad luck mechanics
+    badLuckCurse: false,
+    badLuckEndTime: null,
+    tradingBan: false,
+    tradingBanEndTime: null,
+    accountFrozen: false,
+    accountFreezeEndTime: null,
+
+    // Margin trading
+    marginEnabled: false,
+    currentLeverage: 1, // 1x, 2x, 5x, 10x
+    marginDebt: 0,
+    marginInterestRate: 0.001, // 0.1% per update
+
+    // Trading Mechanics - New Asset Classes
+    shortSellingEnabled: false,
+    shortPositions: [],
+    optionsEnabled: false,
+    optionPositions: [],
+    cryptoAssets: null,
+    forexPairs: null,
+    commodities: null,
+    bonds: null,
+
+    // World Events & Realism
+    earningsHistory: [],
+    dividendStocks: null,
+    totalDividendsEarned: 0,
+    activeMerger: null,
+    bankruptcyLosses: 0,
+    globalMarketOpen: true,
+    marketClosedNotified: false,
+    afterHoursEnabled: false
 };
 
 // Load saved state
