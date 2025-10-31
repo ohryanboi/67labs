@@ -57,11 +57,6 @@ function acquireNode() {
         return;
     }
 
-    // Check if stock is unlocked (only for stocks, not other assets)
-    if (assetType === 'stock' && typeof isStockUnlocked === 'function' && !isStockUnlocked(symbol)) {
-        alert('🔒 This stock is locked! Unlock it by reaching milestones.');
-        return;
-    }
 
     // Mark insider tip action
     if (typeof actOnInsiderTip === 'function') {
